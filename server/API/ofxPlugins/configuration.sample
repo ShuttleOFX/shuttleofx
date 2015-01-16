@@ -1,0 +1,6 @@
+[OFX_PATH]
+globalOfxPluginPath = /path/example
+
+[APP_PLUGIN]
+host = 0.0.0.0
+port = 5010
