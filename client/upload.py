@@ -51,6 +51,7 @@ def upldfile():
         saved_files_urls = []
 
         for f in request.files.getlist('file[]'):
+            print f
             if f and allowed_file(f.filename):
 
                 # filename = uniqueId BD
@@ -80,7 +81,7 @@ def upldfile():
 
                 os.remove(os.path.join(updir, filename))
 
-            return saved_files_urls[0]
+            # return saved_files_urls[0]
 
         return render_template('upload.html', uploaded="true")
 

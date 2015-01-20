@@ -262,14 +262,17 @@ header form{
     background: @bkWhi;
     color: @ofxTxt!important;
     min-height: 1px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 .bottom-header .navbar .navbar-header{
     // padding-bottom: 0.5em;
 }
 
-.filter-title{
+.filter-title span:first-of-type{
     font-weight: 400;
+    line-height: 70px;
 }
 .bottom-header .navbar a{
     font-weight: 400;
@@ -280,15 +283,16 @@ header form{
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 0;
-    padding-top: 22px;
-    padding-bottom: 20px;
-}
 
+}
+.bottom-header .radio{
+    line-height: 70px;
+}
 
 .bottom-header .radio label span{
     margin-left: -34px;
-    margin-top: 4px;
-    
+    margin-top: 27px;
+
 }
 
 .bottom-header .radio .fa{
@@ -482,6 +486,10 @@ ul.right-nav li .fa{
 #left-nav .legacy .legacy-links a:hover{
     color: @ofxColor2;
 }
+
+
+
+
 
 
 

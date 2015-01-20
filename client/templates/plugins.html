@@ -41,7 +41,16 @@
                                 <div class="container-fluid">
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <div class='filter-title'>Display plugins by</div>
+                                            <div class='filter-title'><span>Display : </span>
+                                                <div class="toggler-group">
+                                                    <span class="toggler active" data-toggle="grid">
+                                                        <i class="fa fa-th-large"></i>
+                                                    </span>
+                                                    <span class="toggler" data-toggle="list">
+                                                        <i class="fa fa-th-list"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-2 pull-right filter-item">
                                             <div class="radio radio-primary">
@@ -94,24 +103,22 @@
     <div class="container-fluid">
         <div class="row">
 
+            <ul class="surveys grid">
+
                 {% for plugin in dico.plugins %}
-                    
-                    <div class="col-md-3">
+
+                    <li class="col-md-3">
                         <div class="panel panel-primary">
-                            <div class="panel-heading">
                                 <h3 class="panel-title">{{ plugin.name }}</h3>
-                            </div>
-                            <div class="panel-img">
                                 <img src="http://placehold.it/275x100/ddd/fff&text=OpenFX%20Plateform" alt="" class="img-responsive">
-                            </div>
-                            <div class="panel-body">
-                                {{ plugin.version.major }}
+                                <span>{{ plugin.version.major }}</span>
                                 <a href="/plugins/{{ plugin.id }}" class="btn btn-primary">Test plugin</a>
-                            </div>
                         </div>
-                    </div>
+                    </li>
 
                 {% endfor %}
+
+                </ul>
 
         </div>
     </div>

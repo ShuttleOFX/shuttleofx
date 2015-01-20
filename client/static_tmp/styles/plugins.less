@@ -1,0 +1,70 @@
+.toggler-group{
+	position: absolute;
+	top: 2px;
+	left: 85px;
+}
+
+
+.toggler{
+	font-size: 1.5em;
+	opacity: .5;
+	cursor: pointer;
+	&.active{
+		opacity: 1;
+	}
+	&:hover{
+		color: @ofxColor2;
+	}
+	&:active{
+		color: @ofxColor2;
+	}
+
+}
+
+ul.surveys{
+	margin: 0;
+	padding: 0;
+}
+
+ul.surveys.grid{
+	li{
+		h3{
+			width: 100%;
+			background: @ofxColor;
+			padding:10px;
+			color: #fff;
+		}
+	}
+}
+
+ul.surveys.list{
+	list-style: none;
+	li{
+		list-style: none;
+		.panel{
+			min-height: 70px;
+			padding-left: 20px;
+			padding-right: 20px;
+		}
+		width: 100%;
+		h3{
+			float: left;
+			width: auto;
+			line-height: 70px;
+		}
+		img{
+			float: left;
+			width: 50px;
+			height: 50px;
+			border-radius: 100px;
+			margin: 10px; 
+		}
+		span{
+			line-height: 70px;
+			float: left;
+		}
+		a.btn{
+			margin-top: 16px;
+		}
+	}
+}
