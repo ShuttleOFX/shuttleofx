@@ -99,49 +99,86 @@
 {% block content %}
 
 
-<div class="main-content">
+<div class="main-content" id="plugins">
     <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div id="filter-page">
+                    <p class="pager-size">
+                        Plugins par page : 
+                            <select name="size" class="">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                            </select>
+                    </p>
+                    <ul class="pagination pagination-sm pager-check">
+                        <li class="disabled"><a href="javascript:void(0)">«</a></li>
+
+                        {% for n in range(dico.pagination) %}
+                            <li class=""><a href="?page={{n}}">{{n+1}}</a></li>
+                        {% endfor %}
+
+                        <li><a href="javascript:void(0)">»</a></li>
+                    </ul>
+                    <!-- <ul class="pager-check">
+                        <li class="">Page <span>1</span></li>
+                        <li class="previous"><a href="javascript:void(0)" class="disabled"><i class="fa fa-angle-left"></i></a></li>
+                        <li class="next"><a href="javascript:void(0)"><i class="fa fa-angle-right"></i></a></li>
+                    </ul> -->
+                </div>
+            </div>
+
+        </div>
         <div class="row">
 
             <ul class="surveys grid">
 
+                {% set counterImg = 1 %}
                 {% for plugin in dico.plugins %}
 
                     <li class="col-md-3">
                         <div class="panel panel-primary">
                             <div class="plugins-titles">
-                                <img src="http://lorempixel.com/260/125/abstract" alt="" class="img-responsive">
+
+                                <img src="http://loremflickr.com/260/100/abstract?random={{counterImg}}" alt="" class="img-responsive">
                                 <!-- <img src="http://placehold.it/260x125/009688/00897B&text=OpenFX%20Plateform" alt="" class="img-responsive"> -->
 
-                                <h3 class="panel-title">
-                                    {% for property in plugin.properties %}
-                                        {% if property.name == "OfxPropShortLabel" %}
-                                            {{property.value[0]}}
-                                        {% endif %}
-                                    {% endfor %}
-                                </h3>
+                                    <h3 class="panel-title">
+                                        <!-- {% for property in plugin.properties %}
+                                            {% if property.name == "OfxPropShortLabel" %}
+                                                {{property.value[0]}}
+                                            {% endif %}
+                                        {% endfor %} -->
+                                        {{plugin.name}}
+                                    </h3>
                             </div>
                             <div class="plugins-infos">
+                                
                                 <span>
-                                    Version {{ plugin.version.major }}.{{ plugin.version.minor }}
+                                    Version 1.0
                                 </span>
+
                                 <span>
                                     Rating {{ plugin.rate }}
                                 </span>
 
-                                {% for property in plugin.properties %}
+                                <!-- {% for property in plugin.properties %}
                                     {% if property.name == "OfxPropType" %}
                                         <p>{{property.value[0]}}</p>
                                     {% endif %}
-                                {% endfor %}
+                                {% endfor %} -->
+                                <p>{{plugin.shortDescription}}</p>
 
                                 <a href="{{ plugin.uri }}" class="btn btn-flat btn-primary">View infos</a>
-                                <a href="{{ plugin.uri }}" class="btn btn-flat btn-primary">Live render</a>
+                                <a href="/demo/{{plugin.rawIdentifier}}" class="btn btn-flat btn-primary">Live render</a>
                             </div>
                         </div>
 
                     </li>
-
+                {% set counterImg = counterImg + 1 %}
                 {% endfor %}
 
                 </ul>

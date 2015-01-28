@@ -21,23 +21,31 @@
 
 }
 
+
 ul.surveys{
+
 	margin: 0;
+	margin-top: 30px;
 	padding: 0;
 }
 
 ul.surveys.grid{
 	li{
 		list-style: none;
-		h3{
+		// width: auto;
+		.plugins-titles{
 			width: 100%;
-			// background: @ofxColor;
-			padding:10px;
-			font-size: 1.2em;
-			position: absolute;
-			margin-top: -50px;
-			color: #fff;
-			font-family: "Roboto-Light";
+			overflow-x: hidden!important;
+			h3{
+				width: 100%;
+				// position: absolute;
+				background: @ofxColor2;
+				// margin-top: -45px;
+				padding:10px;
+				font-size: 1.1em;
+				color: #fff;
+				font-family: "Roboto-Light";
+			}
 		}
 		span{
 			padding: 10px;
@@ -136,3 +144,54 @@ ul.surveys.list{
 		
 	}
 }
+
+
+
+#filter-page{
+	padding-bottom: 45px;
+	border-bottom: 1px solid #fff;
+}
+
+#plugins p.pager-size{
+	float: left;
+	display: inline-block;
+	width: auto;
+}
+#plugins ul.pager-check{
+	float: right;
+	display: inline-block;
+	margin: 0;
+	display: inline-block;
+}
+#plugins ul.pager-check li{
+	list-style: none;
+}
+
+#plugins ul.pager-check li a{
+	color: @ofxColor;
+	padding: 8px;
+	padding-left: 10px;
+	padding-right: 10px;
+
+}
+
+#plugins ul.pager-check li.active a{
+	background: @ofxColor;
+	color: #fff;
+}
+
+
+// #plugins ul.pager-check li a.disabled{
+// 	cursor: not-allowed;
+// 	color: #ccc!important;
+// }
+
+
+// #plugins ul.pager-check li:first-of-type{
+// 	line-height: 1;
+// }
+// #plugins ul.pager-check li.previous, #plugins ul.pager-check li.next{
+// 	color: @ofxTxt;
+// 	font-size: 2em;
+// }
+

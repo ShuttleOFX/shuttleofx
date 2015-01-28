@@ -33,6 +33,9 @@
                 <div class="row">
                     <div class="col-md-12">
                         <a href="/plugins"><i class="fa fa-angle-left"></i> Back to all plugins</a>
+                        {% set urldemo = plugin.uri %}
+                        {% set urldemo = urldemo[9:] %}
+                        <a href="/demo/{{urldemo}}" class="btn btn-primary btn-render-navbar">Render demo</a>
                     </div>
                 </div>
             </div>
@@ -85,26 +88,17 @@
                         {% set count = 1 %}
                         {% for parameterTab in plugin.parameters %}
                             {% for parameter in parameterTab %}
-                                {% if parameter.name == "OfxPropName" %}
+                                {% if parameter.name == "OfxPropLabel" %}
                                     <tr>
                                         <td>{{ count }}</td>
                                         <td>{{ parameter.value[0] }}</td>
                                         <td>
-                                            {% if parameter.type == -1 %}
-                                                none
-                                            {% endif %}
-                                            {% if parameter.type == 0 %}
-                                                int
-                                            {% endif %}
-                                            {% if parameter.type == 1 %}
-                                                double
-                                            {% endif %}
-                                            {% if parameter.type == 2 %}
-                                                string
-                                            {% endif %}
-                                            {% if parameter.type == 3 %}
-                                                pointer
-                                            {% endif %}
+                                            {% for parameter in parameterTab %}
+                                                {% if parameter.name == "OfxParamPropType" %}
+                                                    {% set val = parameter.value[0] %}
+                                                    {{ val[12:] }}
+                                                {% endif %}
+                                            {% endfor %}
                                         </td>
                                     </tr>
                                 {% endif %}
@@ -116,7 +110,89 @@
             </div>
         </div>
 
+
         <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <h2>Clips <small>(Click on I/O to view specifications)</small></h2>
+                </div>
+
+
+
+                <div class="panel clip">
+                    <span class="clip-name">
+                        {% for property in plugin.properties %}
+                            {% if property.name == "OfxPropShortLabel" %}
+                                {{property.value[0]}}
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+
+                    {% for clipTab in plugin.clips %}
+                        {% for clip in clipTab %}
+
+                            {% if clip.name == "OfxPropName" %}
+
+                                {% if clip.value[0] == "Output" %}
+
+                                    <a tabindex="0" class="clip-output" role="button" data-toggle="popover" data-trigger="focus" title="{{ clip.value[0] }}" data-content=
+                                    {% for clipTab in plugin.clips %}
+                                    {% for cliP in clipTab %}
+                                    {% if cliP.name == "OfxImageEffectPropSupportedComponents" %}
+                                    "Supported components :
+                                    {% for val in cliP.value %}
+                                    {{ val }}
+                                    {% endfor %}"
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% endfor %}
+                                    >{{ clip.value[0] }}</a>
+
+                                {% elif clip.value[0] == "mask"%}
+                                    <a tabindex="0" class="clip-mask" role="button" data-toggle="popover" data-trigger="focus" title="{{ clip.value[0] }}" data-content=
+                                    {% for clipTab in plugin.clips %}
+                                    {% for cliP in clipTab %}
+                                    {% if cliP.name == "OfxImageEffectPropSupportedComponents" %}
+                                    "Supported components :
+                                    {% for val in cliP.value %}
+                                    {{ val }}
+                                    {% endfor %}"
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% endfor %}
+                                    >{{ clip.value[0] }}</a>
+
+                                {% else %}
+                                     <a tabindex="0" class="clip-input" role="button" data-toggle="popover" data-trigger="focus" title="{{ clip.value[0] }}" data-content=
+                                    {% for clipTab in plugin.clips %}
+                                    {% for cliP in clipTab %}
+                                    {% if cliP.name == "OfxImageEffectPropSupportedComponents" %}
+                                    "Supported components :
+                                    {% for val in cliP.value %}
+                                    {{ val }}
+                                    {% endfor %}"
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% endfor %}
+                                    >{{ clip.value[0] }}</a>
+
+                                {% endif %}
+
+                            {% endif %}
+
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+
+
+        <!-- <div class="row">
             <form class="form-horizontal">
                 <div class="plugin-render">
                     <div class="col-md-12">
@@ -127,7 +203,7 @@
                     </div>
                     
 
-                    <!-- <div class="col-md-6">
+                    <div class="col-md-6">
                         <h3>Default image</h3>
                         <img src="{{ url_for('static', filename='images/test.png') }}" alt="" class=" panel render-img img-responsive">
                         
@@ -230,10 +306,10 @@
                                 </div>
                             </fieldset>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
             </form>
         </div>
-    </div>
+    </div> -->
 </div>
 {% endblock %}

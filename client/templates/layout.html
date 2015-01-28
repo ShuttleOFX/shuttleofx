@@ -9,10 +9,10 @@
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/bootstrap.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/material.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/material-wfont.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/ripples.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/jquery.nouislider.min.css') }}">
+  <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/material.css') }}"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/material-wfont.css') }}"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/ripples.css') }}"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/jquery.nouislider.min.css') }}"> -->
 
 
 
@@ -58,45 +58,48 @@
             <img src="http://placehold.it/265x80/ddd/fff&text=OpenFX%20Plateform" alt="" class="img-responsive">
         </div>
         <ul>
+
             <li>
-                <p class="signedIn">Signed in as Armand Biteau</p>
+                <img class="signedIn" src="http://loremflickr.com/100/100/">
+                <a href='#' class="signedIn">Settings <b class="caret"></b></a>
+                <p class="signedIn">Signed in as armandbiteau</p>
             </li>
+
 
             <li class="title-nav"><h4>NAVIGATION</h4></li>
 
-            <li>
+            <!-- <li>
                 <a href='#'><i class="fa fa-user"></i>Personnal account</a>
                 <ul>
                     <li><a href="#">Profile</a></li>
                     <li><a href="#">Plugins</a></li>
                     <li><a href="#">Bundles</a></li>
                 </ul>
-            </li>
+            </li> -->
 
             <li>
                 <a href='/upload'><i class="fa fa-cloud-upload"></i>Upload new plugins</a>
             </li>
             <li class="active">
-                <a href='#'><i class="fa fa-crop"></i>Explore plugins</a>
-                <ul>
+                <a href='/plugins'><i class="fa fa-crop"></i>Explore plugins</a>
+                <!-- <ul>
                     <li><a href="/plugins">View all plugins</a></li>
                     <li><a href="/plugins">Search a plugin</a></li>
-                </ul>
+                </ul> -->
             </li>
             <li>
-                <a href='/plugin'><i class="fa fa-photo"></i>Get a render</a>
+                <a href='/demo'><i class="fa fa-photo"></i>Get a render</a>
             </li>
             <li class="title-nav"><h4>MORE</h4></li>
             <li>
                 <a href='#'><i class="fa fa-sitemap"></i>About the plateform</a>
                 <ul>
-                    <li><a href="#">sous menu 1</a></li>
-                    <li><a href="#">sous menu 2</a></li>
-                    <li><a href="#">sous menu 3</a></li>
+                    <li><a href="#">About us</a></li>
+                    <li><a href="#">Plateform authors</a></li>
                 </ul>
             </li>
             <li>
-                <a href='#'><i class="fa fa-share-alt"></i>OFX community</a>
+                <a href='http://www.openeffects.org' target="_blank"><i class="fa fa-share-alt"></i>OFX community</a>
             </li>
         </ul>
         <div class="legacy">
@@ -144,7 +147,7 @@
         <section id="scroller">
 
 
-        <div class="main" data-0="padding-top:350px" data-150="padding-top: 200px">
+        <div class="main" data-0="padding-top:350px" data-150="padding-top: 300px">
 
 
             {% block content %}{% endblock %}
@@ -166,12 +169,15 @@
     <script src="{{ url_for('static', filename='scripts/vendor/dropzone.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts/vendor/jquery.nouislider.min.js') }}"></script>
 
-    <script src="{{ url_for('static', filename='scripts/combined-scripts.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/scripts.js') }}"></script>
+    <!-- // <script src="{{ url_for('static', filename='scripts/render.js') }}"></script> -->
 
 
 
-    <script>
+    <script type="text/javascript">
 
+
+    $(document).ready(function() {
 
     var site = new Bamboo({
         menu: true,
@@ -181,44 +187,204 @@
         resize: function(){
         }
     });
-    </script>
 
 
-    <script type="text/javascript">
-
-
-    $(document).ready(function() {
-
-    
-        $.material.init();
-
-
-        $slider = $(".shor").noUiSlider({
-            start: 40,
-            connect: "lower",
-            range: {
-                min: 0,
-                max: 100
-            },
-            step: 1,
-            handles : 1,
-            format: wNumb({
-                decimals: false,
-            // postfix: ' %'
-        })
-        });
-        $value = $slider.val();
-    $slider.Link('lower').to($('.input-number'));
-    $slider.Link('lower').to($('#input-number'));
-
+    $.material.init();
 
     $("#left-nav a").click(function(){
-            $("#left-nav ul ul").slideUp();
-            if(!$(this).next().is(":visible"))
-            {
-                $(this).next().slideDown();
+        $("#left-nav ul ul").slideUp();
+        if(!$(this).next().is(":visible"))
+        {
+            $(this).next().slideDown();
+        }
+    });
+
+
+    var marginTopInput = 30;
+    var count = 1;
+    var numItemsInput = $('.clip-input').length + 1;
+    $('.clip').css( "height", marginTopInput*numItemsInput);
+    $('.clip .clip-name').css( "line-height", $('.clip').height() + "px");
+
+
+    $( ".clip-input" ).each(function( i ) {
+        // marginTopInput = marginTopInput / numItemsInput;
+        $( this ).css( "marginTop", marginTopInput*count -15);
+        count += 1;
+    });
+
+
+    $( ".clip-output" ).each(function( i ) {
+        $( this ).css( "marginTop", $('.clip').height()/2 -15);
+    });
+
+
+    $('.clip-input').popover();
+    $('.clip-output').popover();
+    $('.clip-mask').popover();
+
+
+
+    function formToJson()
+    {
+        var renderParameters = [];
+        $("input", $('#renderForm')).each(function(index){
+            var jsonForm={};
+            // console.log(this.type);
+            switch(this.type) {
+                case 'text':
+                    var tab = [];
+                    tab.push(3);
+                    tab.push(3);
+                    jsonForm["id"] = $(this).attr("id");
+                    jsonForm["value"] = tab;
+                    renderParameters.push(jsonForm);
+                    break;
+                case 'number':
+                    jsonForm["id"] = $(this).attr("id");
+                    jsonForm["value"] = parseInt(this.value);
+                    renderParameters.push(jsonForm);
+                    break;
+                case 'range':
+                    jsonForm["id"] = $(this).attr("id");
+                    jsonForm["value"] = parseInt(this.value);
+                    renderParameters.push(jsonForm);
+                    break;
+                case 'checkbox':
+                    if (this.checked) {
+                        jsonForm["id"] = $(this).attr("id");
+                        jsonForm["value"] = true;
+                        renderParameters.push(jsonForm);
+                    }else{
+                        jsonForm["id"] = $(this).attr("id");
+                        jsonForm["value"] = false;
+                        renderParameters.push(jsonForm);
+                    };
+                    break;
+                case 'radio':
+                    if (this.checked) {
+                        jsonForm["id"] = $(this).attr("id");
+                        jsonForm["value"] = this.value;
+                        renderParameters.push(jsonForm);
+                    };
+                    break;
+                default:
+                    jsonForm["id"] = $(this).attr("id");
+                    jsonForm["value"] = parseInt(this.value);
+                    renderParameters.push(jsonForm);
+                    break;
             }
         });
+
+        $("select", $('#renderForm')).each(function(index){
+            var jsonForm={};
+            jsonForm["id"] = $(this).attr("id");
+            jsonForm["value"] = this.value;
+            renderParameters.push(jsonForm);
+        });
+
+        return renderParameters;
+    }
+
+
+
+    $("#render.OfxImageEffectContextGenerator").click(function(){
+        var pluginId = $(this).attr("pluginId");
+        console.log('Generator: ' + pluginId );
+        var renderParameters = formToJson();
+
+        console.log(renderParameters);
+        // $('#resultForm').text(JSON.stringify(renderParameters));
+
+        $.ajax({
+            type: "POST",
+            url: "/render",
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                nodes: [{
+                    id: 0,
+                    plugin: pluginId,
+                    parameters: renderParameters
+                },{
+                    id: 1,
+                    plugin: "tuttle.pngwriter",
+                    parameters: []
+                }],
+
+                connections: [{
+                        src: {id: 0},
+                        dst: {id: 1}
+                }],
+                renderNode: {id: 1}
+            }),
+        })
+        .done(function(data){
+            console.log('POST DONE !');
+            $("#viewer img").attr("src", "/resource/"+data.render.outputFile);
+            $("#download-view").attr("href", "/resource/"+data.render.outputFile);
+            $("#download-view").removeClass('disabled');
+        })
+        .error(function(data){
+            console.log('POST ERROR !');
+        })
+    });
+
+    $("#render.OfxImageEffectContextFilter").click(function(){
+        var pluginId = $(this).attr("pluginId");
+        console.log('Filter: ' + pluginId );
+        var renderParameters = formToJson();
+
+        console.log(renderParameters);
+        // $('#resultForm').text(JSON.stringify(renderParameters));
+
+        $.ajax({
+            type: "POST",
+            url: "/render",
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                nodes: [{
+                    id: 0,
+                    plugin: "tuttle.jpegreader",
+                    parameters: [
+                        {
+                            "id" : "filename",
+                            "value" : "/home/hugo/WebOpenFX/demo/wofx/server/resources/lol.jpg"
+                        }
+                    ]
+                },                {
+                    id: 1,
+                    plugin: pluginId,
+                    parameters: renderParameters
+                },{
+                    id: 2,
+                    plugin: "tuttle.pngwriter",
+                    parameters: []
+                }],
+
+                connections: [{
+                        src: {id: 0},
+                        dst: {id: 1}
+                },{
+                        src: {id: 1},
+                        dst: {id: 2}
+                }],
+                renderNode: {id: 2}
+            }),
+        })
+        .done(function(data){
+            console.log('POST DONE !');
+            $("#viewer img").attr("src", "/resource/"+data.render.outputFile);
+            $("#download-view").attr("href", "/resource/"+data.render.outputFile);
+            $("#download-view").removeClass('disabled');
+            // console.log(data.render.outputFile);
+        })
+        .error(function(data){
+            console.log('POST ERROR !');
+        })
+    });
+
+
+
 
     });
 

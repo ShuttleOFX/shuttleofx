@@ -222,7 +222,9 @@ module.exports = function (grunt) {
             'styles/vendor/*.css',
             'styles/vendor/*.map',
             
-            'scripts/vendor/*.js'
+            'scripts/vendor/*.js',
+            'scripts/*.js'
+
 
 
 

@@ -12,7 +12,8 @@
 
 
 .main{
-    min-height: 2000px;
+    min-height: 100%;
+    padding-bottom: 300px;
     background: @bkGrey;
     border-left: 1px solid #ddd;
 }
@@ -116,7 +117,7 @@ header form{
     transition:all 300ms;
     position:relative;
     padding-left: 30px;
-    padding-right: 30px;
+    padding-right: 22px;
 }
 #searchForm:before{
   display:block;
@@ -369,21 +370,53 @@ ul.right-nav li .fa{
 }
 
 
+#left-nav img.signedIn{
+    margin-top: 1em;
+    margin-left: 30px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+#left-nav a.signedIn{
+    position: absolute;
+    margin-left: 50px;
+    margin-top: -32px;
+    padding-bottom: 1em;
+    color: #555;
+    width: 215px;
+
+}
+
+
 #left-nav p.signedIn{
     width: 265px;
-    margin-top: 1em;
+
+    display: block;
+    margin-top: 1.2em;
     padding-left: 30px;
     padding-right: 30px;
-
-    width: 100%;
+    font-size: 0.9em;
 }
+
+
+#left-nav ul {
+    line-height: 2;
+    padding-top: 1em;
+}
+
+#left-nav ul {
+    line-height: 2;
+    padding-top: 1em;
+}
+
 
 #left-nav .fa{
     padding-right: 10px;
 }
 
 #left-nav ul li.title-nav{
-    margin-top: 3em;
+    margin-top: 3.5em;
     margin-bottom: 1.5em;
     width: 265px;
     margin-left: 0px;
@@ -423,8 +456,11 @@ ul.right-nav li .fa{
     color: @ofxTxt;
     color: #555;
     background: none;
-
 }
+
+
+
+
 
 #left-nav ul li a:hover {
     color: @ofxColor2;

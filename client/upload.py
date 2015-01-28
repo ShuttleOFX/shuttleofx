@@ -8,13 +8,10 @@ from flask import (
     url_for,
     jsonify
 )
-from werkzeug import secure_filename
-import os, zipfile, tarfile
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+import requests
+import json
 
-
-# app = Flask(__name__)
 
 
 from client import app
@@ -33,6 +30,7 @@ def allowed_file(filename):
 
 
 @app.route('/upload')
+# @login_required
 def upld():
     return render_template('upload.html', uploaded=None)
 
@@ -42,58 +40,40 @@ def upld():
 #     return render_template('configureUpload.html')
 
 
-@app.route('/upload', methods=['POST'])
-def upldfile():
+@app.route('/bundle/<bundleId>/upload', methods=['POST'])
+# @login_required
+def upldfile(bundleId):
     if request.method == 'POST':
 
         # print basedir
 
         saved_files_urls = []
 
-        for f in request.files.getlist('file[]'):
-            print f
-            if f and allowed_file(f.filename):
-
-                # filename = uniqueId BD
-                filename = secure_filename(f.filename)
-
-                print filename
-
-                updir = os.path.join(basedir, UPLOAD_FOLDER)
-                f.save(os.path.join(updir, filename))
-                file_size = os.path.getsize(os.path.join(updir, filename))
-                saved_files_urls.append(url_for('uploaded_file', filename=filename))
-
-                # zipf = zipfile.ZipFile(updir + filename, "r")
-                # for name in zipf.namelist():
-                #     print name
-
-                extension = os.path.splitext(filename)[1]
-                print extension
-
-                if extension == ".zip":
-                    with zipfile.ZipFile(updir + filename, "r") as zipf:
-                        zipf.extractall(updir)
-                if extension == ".gz":
-                    tarf = tarfile.open(updir + filename, 'r')
-                    tarf.extractall(updir)
+        #for f in request.files.getlist('file[]'):
 
 
                 # os.remove(os.path.join(updir, filename))
 
             # return saved_files_urls[0]
 
+        header = {'content-type' : request.headers['content-type']}
+        req = requests.post('http://0.0.0.0:5002/bundle/'+bundleId+'/archive', data=request.data, headers = header)
         return render_template('upload.html', uploaded="true")
 
 
 
 
 @app.route('/uploads/<filename>')
+# @login_required
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 
 
-
+@app.route('/bundle', methods=['POST'])
+def newMetaBundle() :
+    header = {'content-type' : 'application/json'}
+    req = requests.post('http://0.0.0.0:5002/bundle', data=json.dumps(request.form), headers = header)
+    return req.text , req.status_code
 
 
