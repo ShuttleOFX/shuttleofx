@@ -50,8 +50,7 @@ class Bundle:
         pluginsDescription = {'plugins':[], 'total': len(plugins)}
 
         for plugin in plugins:
-            pluginsDescription['plugins'].append(analyzePlugin.getPluginProperties(plugin))
-            print plugin.getRawIdentifier()
+            pluginsDescription['plugins'].append(analyzePlugin.getPluginProperties(plugin)
 
         queue.put(pluginsDescription)
 
