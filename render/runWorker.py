@@ -1,13 +1,16 @@
-from pyTuttle import tuttle
-from flask import Flask, jsonify, request, abort, Response, send_file
-from logging.handlers import RotatingFileHandler
-import tempfile, ConfigParser, uuid, io, logging, os
+#!/usr/bin/python
+from flask import Flask, request, jsonify, send_file
+import os
+import uuid
+import tempfile
+import ConfigParser
 
-#class
 import renderScene
 
 configParser =  ConfigParser.RawConfigParser()
-configParser.read('configuration.conf')
+configParser.read('configuration.cfg')
+
+app = Flask(__name__, static_folder='', static_url_path='')
 
 renders = []
 listImg = {}
@@ -17,23 +20,17 @@ tmpRenderingPath = os.path.join(currentAppDir, "render")
 if not os.path.exists(tmpRenderingPath):
   os.mkdir(tmpRenderingPath)
 
-r = renderScene.RenderScene()
-
-
-app = Flask(__name__)
-
-
-
 
 # send graph informations, nodes and connections
 @app.route('/render', methods=['POST'])
 def newRender():
-    global r
+    r = renderScene.RenderScene()
+
     datas = request.json
     userID = "johnDoe"
     renderID = str(uuid.uuid1())
 
-    tmpFile = tempfile.mkstemp(prefix='tuttle_', suffix="_"+userID+".png", dir=tmpRenderingPath)
+    tmpFile = tempfile.mkstemp(prefix='tuttle_', suffix="_" + userID + ".png", dir=tmpRenderingPath)
     resourcePath = os.path.basename(tmpFile[1])
 
     newRender = {}
@@ -45,23 +42,13 @@ def newRender():
     renders.append( newRender )
 
     r = renderScene.RenderScene()
+    
     r.setPluginPaths("")
     r.loadGraph(newRender, outputFilename=tmpFile[1])
     r.computeGraph()
     
     return jsonify(render=newRender)
 
-'''
- update graph informations
- data example 
-{
-    "update": {
-        "progress": 2,
-        "last_request_time": 1421079769.27,
-        "priority": 1
-    }
-}
-'''
 
 @app.route('/render/<renderID>', methods=['PUT'])
 def updateRequest(renderPath):
@@ -117,8 +104,6 @@ def deleteRenderById(renderID):
     del renders[renderID]
 
 
-
-
 @app.route('/resources/', methods=['POST'])
 def addResource():
     global listImg
@@ -144,8 +129,8 @@ def addResource():
 
 @app.route('/resources/<resourceId>', methods=['GET'])
 def getResource(resourceId):
-    if os.path.isfile("../resources/"+resourceId):
-        return send_file("../resources/"+resourceId)
+    if os.path.isfile("../resources/" + resourceId):
+        return send_file("../resources/" + resourceId)
     abort(404)
     return
 
@@ -160,14 +145,5 @@ def getAllResources():
         _id = str(uuid.uuid4())
         listImg[_id] = "/resources/" + str(image)
 
-
-
-
-
 if __name__ == "__main__":
-    getAllResources()
-    app.run(host=configParser.get("APP_RENDER", "host"), port=configParser.getint("APP_RENDER", "port"), debug=True)
-
-    handler = RotatingFileHandler('/tmp/worker.log', backupCount=1)
-    handler.setLevel(logging.DEBUG)
-    app.logger.addHandler(handler)
+	app.run(host=configParser.get("APP_RENDER", "host"), port=configParser.getint("APP_RENDER", "port"), debug=True)
