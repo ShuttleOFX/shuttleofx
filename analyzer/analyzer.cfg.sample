@@ -1,6 +1,7 @@
-[APP_CLIENT]
+[APP_ANALYZER]
 host = 0.0.0.0
-port = 5001
+port = 5004
+
 analyzeRootUri = http://localhost:5004
 renderRootUri = http://localhost:5003
 catalogRootUri = http://localhost:5002

@@ -1,7 +1,0 @@
-[OFX_PATH]
-globalOfxPluginPath = /home/juliette/Programmation_compilation/webOpenOFX/TuttleOFX/install/
-genArtsPath = /usr/genarts/SapphireOFX/
-
-[APP_PLUGIN]
-host = 0.0.0.0
-port = 5004
