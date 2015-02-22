@@ -4,90 +4,112 @@ import os
 import uuid
 import tempfile
 import ConfigParser
+import multiprocessing
+from multiprocessing import Process, Manager
 
 import renderScene
+
+
 
 configParser =  ConfigParser.RawConfigParser()
 configParser.read('configuration.cfg')
 
-app = Flask(__name__, static_folder='', static_url_path='')
+g_app = Flask(__name__, static_folder='', static_url_path='')
 
-renders = []
-listImg = {}
+# list of all computing renders
+g_renders = {}
+g_rendersSharedInfo = {}
+
+# Pool for rendering jobs
+# processes=None => os.cpu_count()
+g_pool = multiprocessing.Pool(processes=4)
+
+# Manager to share rendering information
+g_manager = Manager()
+
+# list of all rendered resources
+g_listImg = {}
 
 currentAppDir = os.path.dirname(__file__)
 tmpRenderingPath = os.path.join(currentAppDir, "render")
 if not os.path.exists(tmpRenderingPath):
   os.mkdir(tmpRenderingPath)
 
+# TODO: replace multiprocessing with https://github.com/celery/billiard to have timeouts in the Pool.
 
-# send graph informations, nodes and connections
-@app.route('/render', methods=['POST'])
+# TODO atexit:
+# g_pool.terminate()
+# g_pool.join()
+
+
+@g_app.route('/render', methods=['POST'])
 def newRender():
-    r = renderScene.RenderScene()
+    '''
+    Create a new render and return graph informations.
+    '''
+    global g_app, g_renders, g_pool
 
     datas = request.json
     userID = "johnDoe"
     renderID = str(uuid.uuid1())
 
-    tmpFile = tempfile.mkstemp(prefix='tuttle_', suffix="_" + userID + ".png", dir=tmpRenderingPath)
-    resourcePath = os.path.basename(tmpFile[1])
+    _, tmpFilepath = tempfile.mkstemp(prefix='tuttle_', suffix="_" + userID + ".png", dir=tmpRenderingPath)
+    resourcePath = os.path.basename(tmpFilepath)
 
     newRender = {}
     newRender['id'] = renderID
-    newRender['outputFile'] = resourcePath
+    newRender['outputFilename'] = resourcePath
     newRender['scene'] = datas
+    g_renders[renderID] = newRender
 
-    app.logger.debug("new resource is " + resourcePath)
-    renders.append( newRender )
+    g_app.logger.debug('new resource is ' + resourcePath)
 
-    r = renderScene.RenderScene()
-    
-    r.setPluginPaths("")
-    r.loadGraph(newRender, outputFilename=tmpFile[1])
-    r.computeGraph()
-    
+    renderSharedInfo = g_manager.dict()
+    renderSharedInfo['status'] = 0
+    g_rendersSharedInfo[renderID] = renderSharedInfo
+
+    g_pool.apply_async(renderScene.computeGraph, args=[renderSharedInfo, newRender, tmpFilepath])
+
     return jsonify(render=newRender)
 
 
-@app.route('/render/<renderID>', methods=['PUT'])
-def updateRequest(renderPath):
-    for render in renders:
-        if renderID not in render:
-            app.logger.error('id '+renderID+" doesn't exists")
-            abort(404)
-    for key, value in request.json["update"].items():
-        renders[renderID][key] = value
-
-# return compute status
-@app.route('/stats/', methods=['GET'])
-def getStatus():
-    global r
-    return str(r.getStatus())
+@g_app.route('/progress/<renderID>', methods=['GET'])
+def getProgress(renderID):
+    '''
+    Return render progress.
+    '''
+    global g_rendersSharedInfo
+    return str(g_rendersSharedInfo[renderID]['status'])
 
 
-# return all renders in json format
-@app.route('/render', methods=['GET'])
+@g_app.route('/render', methods=['GET'])
 def getRenders():
-    totalRenders = {"renders": renders}
+    '''
+        Returns all renders in JSON format
+    '''
+    totalRenders = {"renders": g_rendersSharedInfo}
     return jsonify(**totalRenders)
 
 
-# get a render by id in json format
-@app.route('/render/<renderID>', methods=['GET'])
+@g_app.route('/render/<renderID>', methods=['GET'])
 def getRenderById(renderID):
-    global renders
+    '''
+    Get a render by id in json format.
+    '''
+    global g_renders
 
-    for render in renders:
-        if renderID == render['id']:
+    for key, render in g_renders.iteritems():
+        if renderID == key:
             return jsonify(render=render)
-    jsonify(render=None)
-    app.logger.error('id '+ renderID +" doesn't exists")
+    g_app.logger.error('id '+ renderID +" doesn't exists")
     abort(404)
 
 
-@app.route('/render/<renderId>/resources/<resourceId>', methods=['GET'])
+@g_app.route('/render/<renderId>/resources/<resourceId>', methods=['GET'])
 def resource(renderId, resourceId):
+    '''
+    Returns file resource by renderId and resourceId.
+    '''
     if os.path.isfile(tmpRenderingPath + "/" + resourceId):
         return send_file( tmpRenderingPath + "/" + resourceId )
     else:
@@ -95,22 +117,28 @@ def resource(renderId, resourceId):
         abort(404)
 
 
-# delete a render from the render array
-@app.route('/render/<renderID>', methods=['DELETE'])
+@g_app.route('/render/<renderID>', methods=['DELETE'])
 def deleteRenderById(renderID):
-    if renderID not in renders:
-        app.logger.error('id '+renderID+" doesn't exists")
+    '''
+    Delete a render from the render array.
+    TODO: needed?
+    TODO: kill the corresponding process?
+    '''
+    if renderID not in g_renders:
+        g_app.logger.error('id '+renderID+" doesn't exists")
         abort(400)
-    del renders[renderID]
+    del g_renders[renderID]
 
 
-@app.route('/resources/', methods=['POST'])
+@g_app.route('/resources/', methods=['POST'])
 def addResource():
+    '''
+    Upload resource file on the server and returns id and uri.
+    '''
     global listImg
 
     uid = str(uuid.uuid1())
     img = request.data
-    print request.headers
     ext = request.headers.get("Content-Type").split('/')[1]
 
     imgFile = "/resources/" + uid + "." + ext
@@ -127,23 +155,34 @@ def addResource():
 
     return jsonify(**objectId)
 
-@app.route('/resources/<resourceId>', methods=['GET'])
+
+@g_app.route('/resources/<resourceId>', methods=['GET'])
 def getResource(resourceId):
+    '''
+    Returns resource file.
+    '''
     if os.path.isfile("../resources/" + resourceId):
         return send_file("../resources/" + resourceId)
     abort(404)
     return
 
-@app.route('/resources/', methods=['GET'])
+@g_app.route('/resources/', methods=['GET'])
 def getResourcesDict():
+    '''
+     Returns a list of all resources on server.
+    '''
     global listImg
     ret = {"files" : listImg }
     return jsonify(**ret)
 
 def getAllResources():
-    for image in os.listdir("../resources"):
+    '''
+    Fill the list of images with all resources path on the server.
+    '''
+    for image in os.listdir("resources"):
         _id = str(uuid.uuid4())
         listImg[_id] = "/resources/" + str(image)
 
 if __name__ == "__main__":
-	app.run(host=configParser.get("APP_RENDER", "host"), port=configParser.getint("APP_RENDER", "port"), debug=True)
+    getAllResources()
+    g_app.run(host=configParser.get("APP_RENDER", "host"), port=configParser.getint("APP_RENDER", "port"), debug=True)

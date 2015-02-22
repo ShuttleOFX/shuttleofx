@@ -1,59 +1,107 @@
 from pyTuttle import tuttle
 import logging, time, ConfigParser
 
+
+
 configParser =  ConfigParser.RawConfigParser()
 configParser.read('configuration.cfg')
 
-class RenderScene:
-    def __init__(self):
-        self.nodes = []
-        self.tuttleGraph = tuttle.Graph()
-        self.globalOfxPluginPath = configParser.get("OFX_PATH", "globalOfxPluginPath")
-        self.graph = None
-        self.status = 0 #-1 aborted 0 undefined, 1 loading, 2 computing  3, complete
+globalOfxPluginPath = configParser.get("OFX_PATH", "globalOfxPluginPath")
 
 
-    def setPluginPaths(self, ofxPluginPath):
+class ProgressHandle(tuttle.IProgressHandle):
+    def __init__(self, renderSharedInfo):
+        super(ProgressHandle, self).__init__()
+        self.renderSharedInfo = renderSharedInfo
 
-        tuttle.core().getPluginCache().addDirectoryToPath(self.globalOfxPluginPath)
-        tuttle.core().getPluginCache().addDirectoryToPath(ofxPluginPath)
-        pluginCache = tuttle.core().getPluginCache()
-        tuttle.core().preload(False)
+    def beginSequence(self):
+        """Called before the beginning of the process
+        """
+        print "---> beginSequence"
+
+    def setupAtTime(self):
+        """Called when setting up an image
+        """
+        pass
+
+    def processAtTime(self):
+        """Called before processing an image
+        """
+        self.renderSharedInfo["status"] = 99
+        print "---> processAtTime"
+
+    def endSequence(self):
+        """Called at the end of the process
+        """
+        print "---> endSequence"
+
+def setPluginPaths(ofxPluginPath):
+
+    tuttle.core().getPluginCache().addDirectoryToPath(globalOfxPluginPath)
+    tuttle.core().getPluginCache().addDirectoryToPath(ofxPluginPath)
+    pluginCache = tuttle.core().getPluginCache()
+    tuttle.core().preload(False)
+
+def loadGraph(scene, outputFilename):
+    tuttleGraph = tuttle.Graph()
+    status = 1
+    try:
+        nodes = []
+        for node in scene['nodes']:
+            tuttleNode = tuttleGraph.createNode(str(node['plugin']))
+            for parameter in node['parameters']:
+                param = tuttleNode.getParam(str(parameter["id"]))
+
+                if type(parameter["value"]) == unicode:
+                    parameter["value"] = str(parameter["value"])
+
+                param.setValue(parameter["value"])
+            nodes.append(tuttleNode)
+
+        for connection in scene['connections']:
+            # TODO: replace src/dst with from/to.
+            tuttleGraph.connect([
+                nodes[connection['src']['id']],
+                nodes[connection['dst']['id']],
+                ])
+
+        # TODO: what is the right way to retrieve the output node.
+        outputNode = nodes[-1]
+        # TODO:
+        # if outputNode.getProperties().getProperty("OfxPropContextWriter").getValue():
+        outputFilenameParameter = outputNode.getParam("filename")
+        outputFilenameParameter.setValue( outputFilename )
+
+        return tuttleGraph
+
+    except Exception as e:
+        logging.error("error in the graph " + str(e))
 
 
-    def loadGraph(self, graphToLoad, outputFilename):
-        self.graph = graphToLoad
-        self.status = 1
-        try:
-            for node in graphToLoad['scene']['nodes']:
-                tuttleNode = self.tuttleGraph.createNode(str(node['plugin']))
-                for parameter in node['parameters']:
-                    param = tuttleNode.getParam(str(parameter["id"]))
+def computeGraph(renderSharedInfo, newRender, outputFilename):
+    print "computeGraph"
+    
+    try:
+        renderSharedInfo['startDate'] = time.time()
 
-                    if type(parameter["value"]) == unicode:
-                        parameter["value"] = str(parameter["value"])
+        setPluginPaths(globalOfxPluginPath)
 
-                    param.setValue(parameter["value"])
-                self.nodes.append(tuttleNode)
+        renderSharedInfo['status'] = 1
+        tuttleGraph = loadGraph(newRender['scene'], outputFilename)
 
-            for connection in graphToLoad['scene']['connections']:
-                 self.tuttleGraph.connect( [ self.nodes[connection['src']['id']],  self.nodes[connection['dst']['id']]] )
+        renderSharedInfo['status'] = 2
 
-            outputFilenameParameter = self.nodes[len(self.nodes)-1].getParam("filename")
-            outputFilenameParameter.setValue( outputFilename )
+        computeOptions = tuttle.ComputeOptions()
+        computeOptions.setVerboseLevel(tuttle.eVerboseLevelError)
+        ## Create handle and set it in ComputeOptions
+        progressHandle = ProgressHandle(renderSharedInfo)
+        computeOptions.setProgressHandle(progressHandle)
 
-        except Exception as e:
-            logging.error("error in the graph " + str(e))
+        tuttleGraph.compute(computeOptions)
 
-    def computeGraph(self):
-        try:
-            self.status = 2
-            self.graph["startDate"] = time.time()
-            self.tuttleGraph.compute(self.nodes[len(self.nodes)-1] )
-            self.status = 3
-        except Exception as e:
-            self.status = -1
-            logging.error("Error in render: " + str(e))
+        renderSharedInfo['status'] = 3
 
-    def getStatus(self):
-        return self.status
+    except Exception as e:
+        renderSharedInfo['status'] = -1
+        logging.error("Error in render: " + str(e))
+    
