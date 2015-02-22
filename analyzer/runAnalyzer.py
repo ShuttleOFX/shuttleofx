@@ -17,6 +17,7 @@ def analyzeBundle(bundleId):
     bundle = Bundle.Bundle(bundleId)
     analyzedBundle = None
 
+    print bundleExt.split('/')[1]
     if "gzip" == bundleExt.split('/')[1]:
         bundle.extractDatasAsTar(bundleId,bundleBin)
     if "zip" == bundleExt.split('/')[1]:
