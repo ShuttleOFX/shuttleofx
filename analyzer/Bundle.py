@@ -13,24 +13,28 @@ def launchAnalyze(bundle, sharedBundleDatas, bundleExt, bundleBin, bundleId):
     '''
     Launches the analyze. Set the process status and fill sharedBundleDatas with the analyzed bundle datas. Delete temporary files and directories created during the archive extraction.
     '''
-    sharedBundleDatas["status"] = "start extraction"
+
+    sharedBundleDatas["globalStatus"] = "running"
+    sharedBundleDatas["analyzeStatus"] = "waiting"
+    sharedBundleDatas["extractionStatus"] = "running"
 
     if "gzip" == bundleExt.split('/')[1]:
         bundle.extractDatasAsTar(bundleId, bundleBin)
     elif "zip" == bundleExt.split('/')[1]:
         bundle.extractDatasAsZip(bundleId, bundleBin)
-    sharedBundleDatas["status"] = "end extraction"
+    sharedBundleDatas["extractionStatus"] = "done"
 
-    sharedBundleDatas["status"] = "start analyze"
     analyzedBundle = None
+    sharedBundleDatas["analyzeStatus"] = "running"
     analyzedBundle = bundle.analyze()
-    sharedBundleDatas["status"] = "end analyze"
+    sharedBundleDatas["analyzeStatus"] = "done"
+
+    deleteUnusedFiles(bundle)
+
     sharedBundleDatas["datas"] = analyzedBundle
+    sharedBundleDatas["globalStatus"] = "done"
 
-    deleteUnusedFiles(bundle, sharedBundleDatas)
-
-def deleteUnusedFiles(bundle, sharedBundleDatas):
-    sharedBundleDatas["status"] = 'delete ' + "tmp/" + bundle.id + ".tar.gz"
+def deleteUnusedFiles(bundle):
     os.remove("tmp/" + bundle.id + ".tar.gz")
     shutil.rmtree("tmp/" + bundle.id)
 

@@ -30,7 +30,10 @@ def analyzeBundle(bundleId):
     bundleExt = request.headers.get("Content-Type")
 
     datas = g_sharedBundleDatas[bundleId] = g_manager.dict()
-    datas['status'] = None
+
+    datas["globalStatus"] = None
+    datas["analyzeStatus"] = None
+    datas["extractionStatus"] = None
     datas['datas'] = None
 
 
@@ -38,18 +41,20 @@ def analyzeBundle(bundleId):
 
     return str(True)
 
-@g_app.route('/status/<bundleId>', methods=['GET'])
+@g_app.route('/bundle/<bundleId>', methods=['GET'])
 def getStatus(bundleId):
     '''
     Return the analyze status.
     '''
+
     if bundleId not in g_sharedBundleDatas:
         g_app.logger.error("the id " + bundleId + " doesn't exist")
         abort (404)
 
-    return str(g_sharedBundleDatas[bundleId]['status'])
+    status = { "status": g_sharedBundleDatas[bundleId]["globalStatus"], "extraction": g_sharedBundleDatas[bundleId]["extractionStatus"], "analyse" : g_sharedBundleDatas[bundleId]["analyzeStatus"]}
+    return str(status)
 
-@g_app.route('/datas/<bundleId>', methods=['GET'])
+@g_app.route('/bundle/<bundleId>/datas', methods=['GET'])
 def getBundleDatas(bundleId):
     '''
     Return the analyzed bundle datas.
