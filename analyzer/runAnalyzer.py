@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from flask import Flask, request, jsonify, abort
 import uuid, ConfigParser, tarfile, multiprocessing, shutil, os
-from multiprocessing import Process, Manager
+from multiprocessing import Manager, Pool
 import atexit
 import Bundle
 
@@ -25,19 +25,18 @@ def analyzeBundle(bundleId):
     Apply a pool of process to analyze bundles asynchronously.
     '''
     global g_sharedBundleDatas, g_pool
-    bundle = Bundle.Bundle(bundleId)
+
     bundleBin = request.data
-    bundleExt = request.headers.get("Content-Type")
+    bundleExt = request.headers.get('Content-Type')
 
     datas = g_sharedBundleDatas[bundleId] = g_manager.dict()
 
-    datas["globalStatus"] = None
-    datas["analyzeStatus"] = None
-    datas["extractionStatus"] = None
+    datas['globalStatus'] = None
+    datas['analyzeStatus'] = None
+    datas['extractionStatus'] = None
     datas['datas'] = None
 
-
-    g_pool.apply_async(Bundle.launchAnalyze, args=[bundle, datas, bundleExt, bundleBin, bundleId])
+    g_pool.apply(Bundle.launchAnalyze, args=[datas, bundleExt, bundleBin, bundleId])
 
     return str(True)
 
@@ -48,10 +47,10 @@ def getStatus(bundleId):
     '''
 
     if bundleId not in g_sharedBundleDatas:
-        g_app.logger.error("the id " + bundleId + " doesn't exist")
+        g_app.logger.error('the id ' + bundleId + ''' doesn't exist''')
         abort (404)
 
-    status = { "status": g_sharedBundleDatas[bundleId]["globalStatus"], "extraction": g_sharedBundleDatas[bundleId]["extractionStatus"], "analyse" : g_sharedBundleDatas[bundleId]["analyzeStatus"]}
+    status = { 'status': g_sharedBundleDatas[bundleId]['globalStatus'], 'extraction': g_sharedBundleDatas[bundleId]['extractionStatus'], 'analyse' : g_sharedBundleDatas[bundleId]['analyzeStatus']}
     return str(status)
 
 @g_app.route('/bundle/<bundleId>/datas', methods=['GET'])
@@ -60,7 +59,7 @@ def getBundleDatas(bundleId):
     Return the analyzed bundle datas.
     '''
     if bundleId not in g_sharedBundleDatas:
-        g_app.logger.error("the id " + bundleId + " doesn't exist")
+        g_app.logger.error('the id ' + bundleId + ''' doesn't exist''')
         abort (404)
 
     return str(g_sharedBundleDatas[bundleId]['datas'])
@@ -75,5 +74,6 @@ def quit():
     g_pool.terminate()
     g_pool.join()
 
-if __name__ == "__main__":
-    g_app.run(host=configParser.get("APP_ANALYZER", "host"), port=configParser.getint("APP_ANALYZER", "port"), debug=True)
+if __name__ == '__main__':
+    g_app.run(host=configParser.get('APP_ANALYZER', 'host'), port=configParser.getint('APP_ANALYZER', 'port'), debug=True)
+    
