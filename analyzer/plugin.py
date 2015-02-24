@@ -80,3 +80,4 @@ class Plugin:
         self.clips = clips
 
         return (self.__dict__)
+        

@@ -95,4 +95,5 @@ def launchAnalyze(sharedBundleDatas, bundleExt, bundleBin, bundleId):
 
     sharedBundleDatas['datas'] = analyzedBundle
     sharedBundleDatas['globalStatus'] = 'done'
+    
 
