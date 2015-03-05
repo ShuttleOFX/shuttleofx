@@ -2,5 +2,6 @@
 [MONGODB]
 hostname: localhost
 port: 27017
+dbName: wofx
 bundleTable: bundles
 pluginTable: plugins

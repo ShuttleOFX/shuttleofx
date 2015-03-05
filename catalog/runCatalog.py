@@ -8,13 +8,14 @@ from bson import json_util
 from flask import Flask, jsonify, Response, request, abort
 
 from Bundle import Bundle
+from Plugin import Plugin
 
 app = Flask(__name__)
 
 currentDir = os.path.dirname(os.path.realpath(__file__))
 
 config = ConfigParser.ConfigParser()
-configParser.read(['catalog.cfg', 'heroku.cfg'])
+config.read('catalog.cfg')
 
 client = pymongo.MongoClient(config.get('MONGODB', 'hostname'), config.getint('MONGODB', 'port'))
 db = client.__getattr__(config.get('MONGODB', 'dbName'))
@@ -45,6 +46,13 @@ def newBundle():
     requestResult = bundleTable.find_one({"bundleId": bundleId})
     return mongodoc_jsonify(requestResult)
 
+@app.route('/bundle/<bundleId>/archive', methods=['POST'])
+def uploadArchive(bundleId):
+    requestResult = bundleTable.find_one({"bundleId": bundleId})
+    if requestResult == None:
+        abort(404)
+
+    return mongodoc_jsonify(requestResult)
 
 @app.route("/bundle")
 def getBundles():
@@ -92,7 +100,7 @@ def newPlugin(bundleId):
     
     pluginTable.insert(plugin.__dict__)
 
-    requestResult = pluginTable.find_one({"id": pluginId})
+    requestResult = pluginTable.find_one({"pluginId": pluginId})
     return mongodoc_jsonify(requestResult)
 
 

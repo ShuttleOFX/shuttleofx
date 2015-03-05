@@ -7,7 +7,7 @@ class Bundle:
         self.companyId = None
         self.name = name
         self.description = ""
-        self.shared = false
+        self.shared = False
         self.contributors = []
         self.architecture = []
         self.plugins = []
