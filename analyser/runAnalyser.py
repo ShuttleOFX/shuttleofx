@@ -60,6 +60,17 @@ def getStatus(bundleId):
 
     return jsonify(**g_sharedBundleDatas[bundleId])
 
+@g_app.route('/bundle/<bundleId>/datas', methods=['GET'])
+def getBundleDatas(bundleId):
+    '''
+    Return the analyzed bundle datas.
+    '''
+    if bundleId not in g_sharedBundleDatas:
+        g_app.logger.error('the id ' + bundleId + ''' doesn't exist''')
+        abort (404)
+
+    return str(g_sharedBundleDatas[bundleId]['datas'])
+
 @atexit.register
 def quit():
     '''
