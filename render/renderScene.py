@@ -36,7 +36,6 @@ class ProgressHandle(tuttle.IProgressHandle):
         print "---> endSequence"
 
 def setPluginPaths(ofxPluginPath):
-    tuttle.core().getPluginCache().addDirectoryToPath(globalOfxPluginPath)
     tuttle.core().getPluginCache().addDirectoryToPath(ofxPluginPath)
     pluginCache = tuttle.core().getPluginCache()
     tuttle.core().preload(False)
@@ -83,6 +82,7 @@ def computeGraph(renderSharedInfo, newRender, outputFilename):
     try:
         renderSharedInfo['startDate'] = time.time()
 
+        #TODO set the right plugin path
         setPluginPaths(globalOfxPluginPath)
 
         renderSharedInfo['status'] = 1
