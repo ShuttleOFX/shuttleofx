@@ -43,7 +43,7 @@ def analyseBundle(bundleId):
     datas['extraction'] = "waiting"
     datas['datas'] = None
 
-    g_pool.apply(Bundle.launchAnalyse, args=[datas, bundleExt, bundleBin, bundleId])
+    g_pool.apply_async(Bundle.launchAnalyse, args=[datas, bundleExt, bundleBin, bundleId])
 
     return jsonify(**datas)
 
