@@ -5,7 +5,6 @@ import threading
 import multiprocessing
 import tempfile
 
-
 from pyTuttle import tuttle
 import Plugin
 
@@ -76,24 +75,23 @@ def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
     sharedBundleDatas['status'] = 'running'
     sharedBundleDatas['analyse'] = 'waiting'
     sharedBundleDatas['extraction'] = 'running'
+    bundlePath = None
 
-    bundlePath = 'tmp/' + str(bundleId)
-    os.mkdir(bundlePath)
+    try:
+        bundlePath = tempfile.mkdtemp()
+        if 'gzip' == bundleExt.split('/')[1]:
+            extractDatasAsTar(bundleBin, bundlePath)
+        elif 'zip' == bundleExt.split('/')[1]:
+            extractDatasAsZip(bundleBin, bundlePath)
+        sharedBundleDatas['extraction'] = 'done'
 
-    if 'gzip' == bundleExt.split('/')[1]:
-        extractDatasAsTar(bundleBin, bundlePath)
-    elif 'zip' == bundleExt.split('/')[1]:
-        extractDatasAsZip(bundleBin, bundlePath)
-    sharedBundleDatas['extraction'] = 'done'
+        sharedBundleDatas['analyse'] = 'running'
+        analysedBundle = analyse(bundlePath)
+        sharedBundleDatas['analyse'] = 'done'
+        sharedBundleDatas['datas'] = analysedBundle
+        sharedBundleDatas['status'] = 'done'
+    except:
+        print "Can't create tmp directory for analyse."
+    else:
+        shutil.rmtree(bundlePath)
 
-    analysedBundle = None
-    sharedBundleDatas['analyse'] = 'running'
-    analysedBundle = analyse(bundlePath)
-    sharedBundleDatas['analyse'] = 'done'
-
-    # shutil.rmtree(bundlePath)
-
-    print analysedBundle
-
-    sharedBundleDatas['datas'] = analysedBundle
-    sharedBundleDatas['status'] = 'done'
