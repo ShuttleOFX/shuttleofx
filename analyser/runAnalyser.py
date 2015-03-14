@@ -21,11 +21,6 @@ g_sharedBundleDatas = {}
 # Manager to share analysing information
 g_manager = multiprocessing.Manager()
 
-currentAppDir = os.path.dirname(__file__)
-tmpRenderingPath = os.path.join(currentAppDir, "tmp")
-if not os.path.exists(tmpRenderingPath):
-    os.mkdir(tmpRenderingPath)
-
 @g_app.route('/bundle/<bundleId>', methods=['POST'])
 def analyseBundle(bundleId):
     '''
