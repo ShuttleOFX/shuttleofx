@@ -4,6 +4,7 @@ import tarfile
 import threading
 import multiprocessing
 import tempfile
+import logging
 
 from pyTuttle import tuttle
 import Plugin
@@ -25,7 +26,7 @@ def extractDatasAsTar(datas, outputPath):
 
         tar.close()
     except:
-        print "error while extracting the tar.gz archive"
+        logging.error("error while extracting the tar.gz archive")
     else:
         os.remove(tempFilePath)
 
@@ -41,7 +42,7 @@ def extractDatasAsZip(datas, outputPath):
         f.write(datas)
         f.close()
     except:
-        print "error while extracting the zip archive"
+        logging.error("error while extracting the zip archive")
     else:
         os.remove(tempFilePath)
         raise NotImplementedError()
@@ -91,7 +92,7 @@ def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
         sharedBundleDatas['datas'] = analysedBundle
         sharedBundleDatas['status'] = 'done'
     except:
-        print "Can't create tmp directory for analyse."
+        logging.error("Can't create tmp directory for analyse.")
     else:
         shutil.rmtree(bundlePath)
 
