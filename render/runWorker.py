@@ -78,22 +78,22 @@ def newRender():
     datas = request.json
     renderID = str(uuid.uuid1())
 
-    _, tmpFilepath = tempfile.mkstemp(prefix='tuttle_', suffix=".png", dir=tmpRenderingPath)
-    resourcePath = os.path.basename(tmpFilepath)
+    outputResources = remapPath(datas)
 
     newRender = {}
     newRender['id'] = renderID
-    newRender['outputFilename'] = resourcePath
+    # TODO: return a list of output resources in case of several writers.
+    newRender['outputFilename'] = outputResources[0]
     newRender['scene'] = datas
     g_renders[renderID] = newRender
 
-    g_app.logger.debug('new resource is ' + resourcePath)
+    g_app.logger.debug('new resource is ' + newRender['outputFilename'])
 
     renderSharedInfo = g_manager.dict()
     renderSharedInfo['status'] = 0
     g_rendersSharedInfo[renderID] = renderSharedInfo
 
-    g_pool.apply(renderScene.computeGraph, args=[renderSharedInfo, newRender, tmpFilepath])
+    g_pool.apply(renderScene.computeGraph, args=[renderSharedInfo, newRender])
 
     return jsonify(render=newRender)
 
