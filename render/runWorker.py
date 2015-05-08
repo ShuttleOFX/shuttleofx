@@ -45,6 +45,28 @@ if not os.path.exists(resourcesPath):
 # g_pool.terminate()
 # g_pool.join()
 
+def remapPath(datas):
+    '''
+    Replace PATTERNS with real filepaths.
+    '''
+    outputResources = []
+    for node in datas['nodes']:
+        for parameter in node['parameters']:
+            print 'param:', parameter['id'], parameter['value']
+            if isinstance(parameter['value'], (str, unicode)):
+
+                if '{RESOURCES_DIR}' in parameter['value']:
+                    parameter['value'] = parameter['value'].replace('{RESOURCES_DIR}', resourcesPath)
+
+                if '{UNIQUE_OUTPUT_FILE}' in parameter['value']:
+                    prefix, suffix = parameter['value'].split('{UNIQUE_OUTPUT_FILE}')
+                    print 'prefix, suffix:', prefix, suffix
+                    _, tmpFilepath = tempfile.mkstemp(prefix=prefix, suffix=suffix, dir=renderDirectory)
+                    outputResources.append(os.path.basename(tmpFilepath))
+                    parameter['value'] = tmpFilepath
+
+    return outputResources
+
 
 @g_app.route('/render', methods=['POST'])
 def newRender():
