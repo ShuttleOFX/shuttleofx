@@ -4,6 +4,7 @@ import json
 import pymongo
 import requests
 import ConfigParser
+import logging
 
 from time import sleep
 from bson import json_util
@@ -123,6 +124,7 @@ def analyseBundle(bundleId):
     headers = {'content-type': 'application/gzip'}
     analyseReturn = requests.post(uriAnalyser+"/bundle/"+str(bundleId), data=open(bundle["archivePath"], 'r').read(), headers=headers)
 
+    # TODO: need to lock table during creation (for parallel uploads)
     pluginIdOffset = pluginTable.count()
 
     ofxPropList = {"OfxPropShortLabel", "OfxPropLongLabel"}
@@ -143,19 +145,27 @@ def analyseBundle(bundleId):
         currentPlugin.parameters = plugin['parameters']
         currentPlugin.properties = plugin['properties']
         currentPlugin.rawIdentifier = plugin['rawIdentifier']
+        logging.warning('Add plugin: %s' % currentPlugin.rawIdentifier)
         currentPlugin.uri = plugin['uri']
         currentPlugin.version = plugin['version']
 
-        for prop in plugin['properties']:
-            name = prop['name']
-            if name in ofxPropList :
-                value = prop['value']
+        properties = dict((prop['name'], prop['value']) for prop in plugin['properties'])
 
-                if name == "OfxPropShortLabel":
-                    currentPlugin.shortName = value[0]
+        # Some plugins may have an empty value.
+        # So we try multiple key to ensure that we always have a value.
+        currentPlugin.shortName = properties['OfxPropShortLabel'][0]
+        if not currentPlugin.shortName:
+            currentPlugin.shortName = properties['OfxPropLabel'][0]
+            if not currentPlugin.shortName:
+                currentPlugin.shortName = currentPlugin.rawIdentifier
 
-                if name == "OfxPropLongLabel":
-                    currentPlugin.name = value[0]
+        currentPlugin.name = properties['OfxPropLabel'][0]
+        if not currentPlugin.name:
+            currentPlugin.name = properties['OfxPropShortLabel'][0]
+            if not currentPlugin.name:
+                currentPlugin.name = properties['OfxPropLongLabel'][0]
+                if not currentPlugin.name:
+                    currentPlugin.name = currentPlugin.rawIdentifier
 
         bundle['plugins'].append(pluginId)
         pluginTable.insert(currentPlugin.__dict__)
