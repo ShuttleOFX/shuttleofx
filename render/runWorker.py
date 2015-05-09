@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from flask import Flask, request, jsonify, send_file, abort
 import os
 import uuid
@@ -29,21 +29,44 @@ g_manager = multiprocessing.Manager()
 # list of all rendered resources
 g_listImg = {}
 
-currentAppDir = os.path.dirname(__file__)
+currentAppDir = os.path.dirname(os.path.abspath(__file__))
 
-tmpRenderingPath = os.path.join(currentAppDir, configParser.get('RENDERED_IMAGE', 'renderedImagesDirectory'))
-if not os.path.exists(tmpRenderingPath):
-  os.makedirs(tmpRenderingPath)
+renderDirectory = os.path.join(currentAppDir, configParser.get('RENDERED_FILES', 'renderedFilesDirectory'))
+if not os.path.exists(renderDirectory):
+    os.makedirs(renderDirectory)
 
 resourcesPath = os.path.join(currentAppDir, configParser.get('RESOURCES', 'resourcesDirectory'))
 if not os.path.exists(resourcesPath):
-  os.makedirs(resourcesPath)
+    os.makedirs(resourcesPath)
+
 
 # TODO: replace multiprocessing with https://github.com/celery/billiard to have timeouts in the Pool.
 
 # TODO atexit:
 # g_pool.terminate()
 # g_pool.join()
+
+def remapPath(datas):
+    '''
+    Replace PATTERNS with real filepaths.
+    '''
+    outputResources = []
+    for node in datas['nodes']:
+        for parameter in node['parameters']:
+            print 'param:', parameter['id'], parameter['value']
+            if isinstance(parameter['value'], (str, unicode)):
+
+                if '{RESOURCES_DIR}' in parameter['value']:
+                    parameter['value'] = parameter['value'].replace('{RESOURCES_DIR}', resourcesPath)
+
+                if '{UNIQUE_OUTPUT_FILE}' in parameter['value']:
+                    prefix, suffix = parameter['value'].split('{UNIQUE_OUTPUT_FILE}')
+                    print 'prefix, suffix:', prefix, suffix
+                    _, tmpFilepath = tempfile.mkstemp(prefix=prefix, suffix=suffix, dir=renderDirectory)
+                    outputResources.append(os.path.basename(tmpFilepath))
+                    parameter['value'] = tmpFilepath
+
+    return outputResources
 
 
 @g_app.route('/render', methods=['POST'])
@@ -56,16 +79,16 @@ def newRender():
     datas = request.json
     renderID = str(uuid.uuid1())
 
-    _, tmpFilepath = tempfile.mkstemp(prefix='tuttle_', suffix=".png", dir=tmpRenderingPath)
-    resourcePath = os.path.basename(tmpFilepath)
+    outputResources = remapPath(datas)
 
     newRender = {}
     newRender['id'] = renderID
-    newRender['outputFilename'] = resourcePath
+    # TODO: return a list of output resources in case of several writers.
+    newRender['outputFilename'] = outputResources[0]
     newRender['scene'] = datas
     g_renders[renderID] = newRender
 
-    g_app.logger.debug('new resource is ' + resourcePath)
+    g_app.logger.debug('new resource is ' + newRender['outputFilename'])
 
     renderSharedInfo = g_manager.dict()
     renderSharedInfo['status'] = 0
@@ -114,10 +137,10 @@ def resource(renderId, resourceId):
     '''
     Returns file resource by renderId and resourceId.
     '''
-    if os.path.isfile( os.path.join(tmpRenderingPath, resourceId) ):
-        return send_file( os.path.join(tmpRenderingPath, resourceId) )
+    if os.path.isfile( os.path.join(renderDirectory, resourceId) ):
+        return send_file( os.path.join(renderDirectory, resourceId) )
     else:
-        logging.error(tmpRenderingPath + resourceId + " doesn't exists")
+        logging.error(renderDirectory + resourceId + " doesn't exists")
         abort(404)
 
 

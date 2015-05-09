@@ -39,7 +39,8 @@ def configLocalPluginPath(ofxPluginPath):
     #logging.error(tuttle.core().getPluginCache())
     logging.error(len(pluginCache.getPlugins()))
 
-def loadGraph(scene, outputFilename):
+def loadGraph(scene):
+ 
     tuttleGraph = tuttle.Graph()
     status = 1
     try:
@@ -49,7 +50,8 @@ def loadGraph(scene, outputFilename):
             for parameter in node['parameters']:
                 param = tuttleNode.getParam(str(parameter["id"]))
 
-                if type(parameter["value"]) == unicode:
+                # Remap unicode to str. TODO: check if it's still needed.
+                if isinstance(parameter["value"], unicode):
                     parameter["value"] = str(parameter["value"])
 
                 param.setValue(parameter["value"])
@@ -61,21 +63,13 @@ def loadGraph(scene, outputFilename):
                 nodes[connection['src']['id']],
                 nodes[connection['dst']['id']],
                 ])
-
-        # TODO: what is the right way to retrieve the output node.
-        outputNode = nodes[-1]
-        # TODO:
-        # if outputNode.getProperties().getProperty("OfxPropContextWriter").getValue():
-        outputFilenameParameter = outputNode.getParam("filename")
-        outputFilenameParameter.setValue( outputFilename )
-
         return tuttleGraph
 
     except Exception as e:
         logging.error("error in the graph " + str(e))
 
 
-def computeGraph(renderSharedInfo, newRender, outputFilename):
+def computeGraph(renderSharedInfo, newRender):
     try:
         renderSharedInfo['startDate'] = time.time()
 
@@ -83,7 +77,7 @@ def computeGraph(renderSharedInfo, newRender, outputFilename):
         configLocalPluginPath(globalOfxPluginPath)
 
         renderSharedInfo['status'] = 1
-        tuttleGraph = loadGraph(newRender['scene'], outputFilename)
+        tuttleGraph = loadGraph(newRender['scene'])
 
         renderSharedInfo['status'] = 2
         tuttleComputeOptions = tuttle.ComputeOptions()
