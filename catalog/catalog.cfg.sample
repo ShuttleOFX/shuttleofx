@@ -10,3 +10,4 @@ port: 27017
 dbName: wofx
 bundleTable: bundles
 pluginTable: plugins
+resourceTable: resources
