@@ -70,18 +70,30 @@ def analyse(pluginPath):
 
     pluginCache = tuttle.core().getPluginCache()
     pluginCache.addDirectoryToPath(str(pluginPath))
-    tuttle.core().preload(False)
-    plugins = pluginCache.getPlugins()
+    tuttle.core().preload(True)
+    tuttlePlugins = pluginCache.getPlugins()
 
     logging.warning('pluginCache: %s' % pluginCache)
     logging.warning('Analyse plugins: %s' % pluginPath)
-    logging.warning('Nb plugins: %s' % len(plugins))
-    pluginsDescription = {'plugins':[], 'total': len(plugins)}
 
-    for currentPlugin in plugins:
+    pluginsDesc = []
+    for currentPlugin in tuttlePlugins:
         logging.warning(currentPlugin.getRawIdentifier())
-        p = Plugin.Plugin(currentPlugin)
-        pluginsDescription['plugins'].append(p.__dict__)
+
+        try:
+            p = Plugin.Plugin(currentPlugin)
+            pluginsDesc.append(p.__dict__)
+        except Exception as e:
+            logging.error("Error in plugin creation: " + str(e))
+
+    pluginsDescription = {
+        'plugins': pluginsDesc,
+        'total': len(pluginsDesc),
+        'unsupported': len(tuttlePlugins) - len(pluginsDesc)
+        }
+
+    logging.warning('Nb plugins: %s' % len(tuttlePlugins))
+    logging.warning('Unsupported plugins: %s' % pluginsDescription['unsupported'])
 
     return pluginsDescription
 

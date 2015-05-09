@@ -5,7 +5,7 @@ propTypeToPythonType = {
     tuttle.ePropTypeDouble: float,
     tuttle.ePropTypeInt: int,
     tuttle.ePropTypeNone: None,
-    tuttle.ePropTypePointer: str,
+    tuttle.ePropTypePointer: None,
     tuttle.ePropTypeString: str,
 }
 
@@ -28,7 +28,7 @@ class Plugin:
             "readOnly": prop.getPluginReadOnly(),
             "type": prop.getType(),
             "modifiedBy": prop.getModifiedBy(),
-            "value": [pythonType(v) for v in prop.getStringValue().split(', ')]
+            "value": [pythonType(v) for v in prop.getStringValue().split(', ')] if pythonType is not None else None
         }
 
     def getDictOfProperties(self, props):
@@ -38,7 +38,7 @@ class Plugin:
         return properties
 
     def initFromPlugin(self, pluginToAnalyse):
-        logging.info('Analysing plugin for ' + str(pluginToAnalyse.getRawIdentifier()))
+        logging.warning('Analysing plugin for ' + str(pluginToAnalyse.getRawIdentifier()))
 
         self.uri = "/plugins/" + str(pluginToAnalyse.getIdentifier())
         self.rawIdentifier = str(pluginToAnalyse.getIdentifier())
@@ -47,11 +47,11 @@ class Plugin:
             'minor': pluginToAnalyse.getVersionMinor()
         }
         
-        try:
-            node = tuttle.createNode(pluginToAnalyse.getIdentifier())
-        except Exception as e:
-            logging.error("Error in node creation: " + str(e))
-            return (self.__dict__)
+        # try:
+        node = tuttle.createNode(pluginToAnalyse.getIdentifier())
+        # except Exception as e:
+        #     logging.error("Error in node creation: " + str(e))
+        #     return (self.__dict__)
 
         # plugin properties
         self.properties = self.getDictOfProperties(node.getProperties())
