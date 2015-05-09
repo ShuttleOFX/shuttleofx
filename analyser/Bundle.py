@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import tarfile
 import logging
@@ -6,7 +7,9 @@ import threading
 import multiprocessing
 import tempfile
 import ConfigParser
-
+import subprocess
+import json
+import argparse
 
 from pyTuttle import tuttle
 import Plugin
@@ -104,7 +107,39 @@ def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
 
     analysedBundle = None
     sharedBundleDatas['analyse'] = 'running'
-    analysedBundle = analyse(bundlePath)
+    if False:
+        # Direct call to the analyse function
+        # Not used, just here for debug purpose.
+        analysedBundle = analyse(bundlePath)
+    else:
+        # Use a subprocess to analyse the bundle.
+        # This allows to modify the LD_LIBRARY_PATH.
+        _, tempFilepath = tempfile.mkstemp()
+        logging.warning('tempFilepath: %s', tempFilepath)
+
+        env = dict(os.environ)
+        # env['OFX_PLUGIN_PATH'] = bundlePath
+        env['LD_LIBRARY_PATH'] = env['LD_LIBRARY_PATH'] + ':{bundlePath}/lib:{bundlePath}/lib64'.format(bundlePath=bundlePath)
+        logging.warning('LD_LIBRARY_PATH: %s', env['LD_LIBRARY_PATH'])
+
+        args = [sys.executable, os.path.abspath(__file__), bundlePath, tempFilepath]
+        p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+        stdoutdata, stderrdata = p.communicate()
+        if p.returncode:
+            sharedBundleDatas['analyse'] = 'error'
+            raise RuntimeError(
+                '''Failed to analyse the Bundle "%s".\n
+                Return code: %s\n
+                Log:\n%s\n%s\n'''
+                % (bundlePath, p.returncode, stdoutdata, stderrdata))
+
+        logging.warning(stdoutdata)
+        logging.warning(stderrdata)
+
+        analysedBundle = json.load(open(tempFilepath, 'r'))
+        logging.warning('analysedBundle: %s' % analysedBundle)
+        # os.path.remove(tempFilepath)
+
     sharedBundleDatas['analyse'] = 'done'
 
     #shutil.rmtree(bundlePath)
@@ -113,3 +148,17 @@ def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
 
     sharedBundleDatas['datas'] = analysedBundle
     sharedBundleDatas['status'] = 'done'
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('bundlePath', type=str,
+                       help='Path to the OFX bundle directory.')
+    parser.add_argument('outputJsonFile', type=str,
+                       help='Output JSON file with the analyse information.')
+    args = parser.parse_args()
+
+    data = analyse(args.bundlePath)
+    jsonData = json.dumps(data, sort_keys=False, indent=4)
+    open(args.outputJsonFile, 'w').write(jsonData)
+    sys.exit(0)
