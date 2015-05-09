@@ -1,6 +1,7 @@
 import os
 import shutil
 import tarfile
+import logging
 import threading
 import multiprocessing
 import tempfile
@@ -64,16 +65,20 @@ def analyse(pluginPath):
     Analyse the bundle an return a description for each plugin.
     '''
 
-    p = Plugin.Plugin()
     pluginCache = tuttle.core().getPluginCache()
     pluginCache.addDirectoryToPath(str(pluginPath))
     tuttle.core().preload(False)
     plugins = pluginCache.getPlugins()
 
+    logging.warning('pluginCache: %s' % pluginCache)
+    logging.warning('Analyse plugins: %s' % pluginPath)
+    logging.warning('Nb plugins: %s' % len(plugins))
     pluginsDescription = {'plugins':[], 'total': len(plugins)}
 
     for currentPlugin in plugins:
-        pluginsDescription['plugins'].append(p.getPluginProperties(currentPlugin))
+        logging.warning(currentPlugin.getRawIdentifier())
+        p = Plugin.Plugin(currentPlugin)
+        pluginsDescription['plugins'].append(p.__dict__)
 
     return pluginsDescription
 

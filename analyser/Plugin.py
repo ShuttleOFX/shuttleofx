@@ -10,14 +10,14 @@ propTypeToPythonType = {
 }
 
 class Plugin:
-    def __init__(self):
+    def __init__(self, pluginToAnalyse):
         self.rawIdentifier = None
         self.name = None
         self.version = {}
         self.clips = []
         self.parameters = []
         self.properties = []
-
+        self.initFromPlugin(pluginToAnalyse)
 
     def getDictOfProperty(self, prop):
 
@@ -37,7 +37,7 @@ class Plugin:
             properties.append(self.getDictOfProperty(p))
         return properties
 
-    def getPluginProperties(self, pluginToAnalyse):
+    def initFromPlugin(self, pluginToAnalyse):
         logging.info('Analysing plugin for ' + str(pluginToAnalyse.getRawIdentifier()))
 
         self.uri = "/plugins/" + str(pluginToAnalyse.getIdentifier())
@@ -67,5 +67,3 @@ class Plugin:
         for clip in node.getClipImageSet().getClips():
             clips.append(self.getDictOfProperties(clip.getProperties()))
         self.clips = clips
-
-        return (self.__dict__)
