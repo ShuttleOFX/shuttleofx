@@ -68,9 +68,10 @@ def analyse(pluginPath):
     Analyse the bundle an return a description for each plugin.
     '''
 
+    tuttle.core().getFormatter().setLogLevel_int(0)
     pluginCache = tuttle.core().getPluginCache()
     pluginCache.addDirectoryToPath(str(pluginPath))
-    tuttle.core().preload(True)
+    tuttle.core().preload(False)
     tuttlePlugins = pluginCache.getPlugins()
 
     logging.warning('pluginCache: %s' % pluginCache)
@@ -149,7 +150,7 @@ def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
         logging.warning(stderrdata)
 
         analysedBundle = json.load(open(tempFilepath, 'r'))
-        logging.warning('analysedBundle: %s' % analysedBundle)
+        # logging.warning('analysedBundle: %s' % analysedBundle)
         # os.path.remove(tempFilepath)
 
     sharedBundleDatas['analyse'] = 'done'
