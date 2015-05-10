@@ -1,5 +1,6 @@
 from pyTuttle import tuttle
 import logging
+import json
 import time
 import ConfigParser
 
@@ -33,7 +34,7 @@ class ProgressHandle(tuttle.IProgressHandle):
         """
 
 def configLocalPluginPath(ofxPluginPath):
-    tuttle.core().getPluginCache().addDirectoryToPath("/tmp/OFX/")#str(globalOfxPluginPath))
+    tuttle.core().getPluginCache().addDirectoryToPath(globalOfxPluginPath)
     pluginCache = tuttle.core().getPluginCache()
     tuttle.core().preload(False)
     #logging.error(tuttle.core().getPluginCache())
@@ -43,30 +44,26 @@ def loadGraph(scene):
  
     tuttleGraph = tuttle.Graph()
     status = 1
-    try:
-        nodes = []
-        for node in scene['nodes']:
-            tuttleNode = tuttleGraph.createNode(str(node['plugin']))
-            for parameter in node['parameters']:
-                param = tuttleNode.getParam(str(parameter["id"]))
+    nodes = []
+    for node in scene['nodes']:
+        tuttleNode = tuttleGraph.createNode(str(node['plugin']))
+        for parameter in node['parameters']:
+            param = tuttleNode.getParam(str(parameter["id"]))
 
-                # Remap unicode to str. TODO: check if it's still needed.
-                if isinstance(parameter["value"], unicode):
-                    parameter["value"] = str(parameter["value"])
+            # Remap unicode to str. TODO: check if it's still needed.
+            if isinstance(parameter["value"], unicode):
+                parameter["value"] = str(parameter["value"])
 
-                param.setValue(parameter["value"])
-            nodes.append(tuttleNode)
+            param.setValue(parameter["value"])
+        nodes.append(tuttleNode)
 
-        for connection in scene['connections']:
-            # TODO: replace src/dst with from/to.
-            tuttleGraph.connect([
-                nodes[connection['src']['id']],
-                nodes[connection['dst']['id']],
-                ])
-        return tuttleGraph
-
-    except Exception as e:
-        logging.error("error in the graph " + str(e))
+    for connection in scene['connections']:
+        # TODO: replace src/dst with from/to.
+        tuttleGraph.connect([
+            nodes[connection['src']['id']],
+            nodes[connection['dst']['id']],
+            ])
+    return tuttleGraph
 
 
 def computeGraph(renderSharedInfo, newRender):
@@ -104,6 +101,6 @@ def computeGraph(renderSharedInfo, newRender):
 
         renderSharedInfo['status'] = 3
 
-    except Exception as e:
+    except:
         renderSharedInfo['status'] = -1
-        logging.error("Error in render: " + str(e))
+        raise

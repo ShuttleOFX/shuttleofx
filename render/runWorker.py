@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, request, jsonify, send_file, abort
+from flask import Flask, request, jsonify, send_file, abort, Response
 import os
 import uuid
 import atexit
@@ -93,8 +93,8 @@ def newRender():
     renderSharedInfo['status'] = 0
     g_rendersSharedInfo[renderID] = renderSharedInfo
 
-    #g_pool.apply(renderScene.computeGraph, args=[renderSharedInfo, newRender, tmpFilepath])
-    renderScene.computeGraph(renderSharedInfo, newRender, tmpFilepath)
+    #g_pool.apply(renderScene.computeGraph, args=[renderSharedInfo, newRender])
+    renderScene.computeGraph(renderSharedInfo, newRender)
     
     return jsonify(render=newRender)
 
@@ -219,7 +219,7 @@ def getAllResources():
 
 
 @atexit.register
-def quit():
+def cleanPool():
     '''
     Close processes and quit pool at exit.
     '''
