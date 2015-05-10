@@ -144,8 +144,33 @@ $("#left-nav a").click(function(){
 
 
 
-</script>
+$('select#pageSize').change(function(){
+    console.log('Select field value has changed to ' + $('select#pageSize').val());
+    var size = $('select#pageSize').val();
+    $.get('/plugin/count?count='+size, function(data) {
+        var plugins = data;
+        var grid = $("#plugins ul.surveys");
+        grid.html("");
+        $.each(plugins.plugins, function(key, val) {
+            var id = val.pluginId;
+            var name = val.name;
+            var version = val.version.major+"."+val.version.minor;
+            var description = "No plugin description";
+            var prop = val.properties;
+            $.each(prop, function() {
+                var nameProp = $(this)[0].name;
+                if (nameProp == "OfxPropPluginDescription") {
+                    var descProp = $(this)[0].value[0];
+                    description = descProp;
+                };
+            });
+            grid.append('<li class="col-md-3"><div class="panel panel-primary"> <a href="/plugin/'+id+'"><div class="plugins-titles"><img src="static/images/logoPad.png" alt="" class="img-responsive plugin-thumbnail"><h3 class="panel-title">'+name+' '+version+'</h3></div></a><div class="plugins-infos"><p>'+description+'</p></div></div></li>');
+        });
+        
+    });
+});
 
+</script>
 
 
 

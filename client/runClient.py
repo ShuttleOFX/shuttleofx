@@ -91,6 +91,14 @@ def searchPlugins():
         abort(req.status_code)
     return jsonify(**req.json())
 
+@app.route("/plugin/count")
+def countPlugins():
+    req = requests.get(catalogRootUri+"/plugin", params=request.args)
+    if req.status_code != 200:
+        abort(req.status_code)
+    return jsonify(**req.json())
+
+
 @app.route('/plugin/<pluginId>')
 def getPlugin(pluginId):
     user = None
