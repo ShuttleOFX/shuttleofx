@@ -2,6 +2,7 @@
 from flask import Flask, request, jsonify, send_file, abort, Response
 import os
 import uuid
+import json
 import atexit
 import logging
 import tempfile
@@ -27,7 +28,7 @@ g_pool = multiprocessing.Pool(processes=4)
 g_manager = multiprocessing.Manager()
 
 # list of all rendered resources
-g_listImg = {}
+g_listImg = []
 
 currentAppDir = os.path.dirname(os.path.abspath(__file__))
 
@@ -53,7 +54,7 @@ def remapPath(datas):
     outputResources = []
     for node in datas['nodes']:
         for parameter in node['parameters']:
-            logging.info('param:', parameter['id'], parameter['value'])
+            logging.warning('param: %s %s', parameter['id'], parameter['value'])
             if isinstance(parameter['value'], (str, unicode)):
 
                 if '{RESOURCES_DIR}' in parameter['value']:
@@ -156,7 +157,7 @@ def deleteRenderById(renderID):
     del g_renders[renderID]
 
 
-@g_app.route('/resources/', methods=['POST'])
+@g_app.route('/resource/', methods=['POST'])
 def addResource():
     '''
     Upload resource file on the server and returns id and uri.
@@ -167,55 +168,51 @@ def addResource():
     img = request.data
     ext = request.headers.get("Content-Type").split('/')[1]
 
-    imgFile = os.path.join(resourcesPath, uid + '.' + ext)
+    filename = uid + '.' + ext
+    imgFile = os.path.join(resourcesPath, filename)
 
     f = open(imgFile, 'w')
     f.write(img)
     f.close()
 
-    objectId = {'id': uid,
-                'uri': '/resources/' + uid
+    objectId = {'id': filename,
+                'uri': '/resource/' + uid
     }
 
-    g_listImg[uid] = imgFile
+    g_listImg.append(filename)
 
     return jsonify(**objectId)
 
 
-@g_app.route('/resources/<resourceId>', methods=['GET'])
+@g_app.route('/resource/<resourceId>', methods=['GET'])
 def getResource(resourceId):
     '''
     Returns resource file.
     '''
-
     global g_listImg
 
     print json.dumps(g_listImg, indent=4)
-    imageName = os.path.basename(g_listImg[resourceId])
 
-    filePath = os.path.join(resourcesPath, imageName)
+    filePath = os.path.join(resourcesPath, resourceId)
     if os.path.isfile(filePath):
         return send_file(filePath)
     abort(404)
     return
 
-@g_app.route('/resources/', methods=['GET'])
+@g_app.route('/resource/', methods=['GET'])
 def getResourcesDict():
     '''
      Returns a list of all resources on server.
     '''
     global g_listImg
-    ret = {"files" : g_listImg }
-    return jsonify(**ret)
+    return jsonify(resources=g_listImg)
 
-def getAllResources():
+def retrieveResources():
     '''
     Fill the list of images with all resources path on the server.
     '''
     global g_listImg
-    for image in os.listdir(str(resourcesPath)):
-        _id = str(uuid.uuid4())
-        g_listImg[_id] = os.path.join(str(resourcesPath), str(image))
+    g_listImg = [str(image) for image in os.listdir(str(resourcesPath))]
 
 
 @atexit.register
@@ -229,5 +226,5 @@ def cleanPool():
     g_pool.join()
 
 if __name__ == "__main__":
-    getAllResources()
+    retrieveResources()
     g_app.run(host=configParser.get("APP_RENDER", "host"), port=configParser.getint("APP_RENDER", "port"), debug=True)

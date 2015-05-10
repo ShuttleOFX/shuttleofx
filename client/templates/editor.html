@@ -83,7 +83,7 @@
                             </a>
 
 
-                            
+
 
 
                         </div>
@@ -93,8 +93,6 @@
                             <img src="" alt="" class="panel panel-primary img-responsive">
                             <div id="viewer-placeholder">
                                 <h2>Click
-                                {% for property in plugin.properties %}
-                                {% if property.name == "OfxPropShortLabel" %}
                                     {% set rawIdentifier = plugin.uri %}
                                         <input type="button" value="Render" id="render" pluginId="{{rawIdentifier[9:]}}" 
                                             {% for property in plugin.properties %}
@@ -107,12 +105,39 @@
                                                 {% endif %}
                                             {% endfor %}
                                         >
-                                {% endif %}
-                            {% endfor %}
                                  to try the plugin</h2>
                             </div>
                         </div>
                     </div>
+                    {% set countContext = 0 %}
+                    {% for property in plugin.properties %}
+                    {% if property.name == "OfxImageEffectPropSupportedContexts" %}
+                        {% for context in property.value if context == "OfxImageEffectContextFilter" and countContext == 0 %}
+                        {% set countContext = 1 %}
+                                <div class="row">
+                                <div class="col-md-12">
+                                    <div class="page-header">
+                                        <h3>Samples gallery</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                {% for resource in resources %}
+                                <div class="col-md-3">
+                                    <div class="preview-img panel panel-primary img-responsive">
+                                        <img class="sampleImage" src="" id="{{ resource }}">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                        {% endfor%}
+                    {% endif %}
+                {% endfor %}
+
+                    
+
+
                     <div class="row-fluid">
                         <div id="graph" class="graph">
                             <div id="resultForm"></div>

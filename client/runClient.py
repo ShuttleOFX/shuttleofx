@@ -25,7 +25,6 @@ configParser.read('client.cfg')
 googleId =configParser.get('OAUTH_CONFIG', 'googleId')
 googleSecret =configParser.get('OAUTH_CONFIG', 'googleSecret')
 
-
 app.config['GOOGLE_ID'] = googleId
 app.config['GOOGLE_SECRET'] = googleSecret
 app.debug = True
@@ -107,7 +106,8 @@ def renderPageWithPlugin(pluginId):
     if 'google_token' in session:
         user = google.get('userinfo').data
     resp = requests.get(catalogRootUri+"/plugin/"+pluginId)
-    return render_template('editor.html', plugin=resp.json(), user=user)
+    previewGallery = requests.get(renderRootUri + '/resource/')
+    return render_template('editor.html', plugin=resp.json(), user=user, **previewGallery.json())
 
 @app.route('/render', methods=['POST'])
 def render():
@@ -127,6 +127,19 @@ def getRenderStatus(renderId):
 def getRenderResource(renderId, resourceId):
     req = requests.get(renderRootUri+"/render/"+str(renderId)+"/resource/"+resourceId)
     return Response(req.content, mimetype="image/jpeg")
+
+
+@app.route('/resource/<resourceId>', methods=['GET'])
+def getResourceById(resourceId):
+    req = requests.get(renderRootUri+"/resource/"+resourceId)
+    return Response(req.content, mimetype="image/png")
+
+@app.route('/resource', methods=['GET'])
+def getResources() :
+    req = requests.get(renderRootUri + '/resource/')
+    if req.status_code != 200:
+         abort(req.status_code)
+    return jsonify(**req.json())
 
 @app.route('/upload')
 @login_required

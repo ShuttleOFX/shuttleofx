@@ -95,7 +95,7 @@ $("#render.OfxImageEffectContextGenerator").click(function(){
                 plugin: "tuttle.pngwriter",
                 parameters: [{
                     id: "filename",
-                    value: "{UNIQUE_OUTPUT_FILE}" + ".png"
+                    value: "{UNIQUE_OUTPUT_FILE}.png"
                 }
 
                 ]
@@ -105,6 +105,7 @@ $("#render.OfxImageEffectContextGenerator").click(function(){
                     src: {id: 0},
                     dst: {id: 1}
             }],
+            options:[],
         }),
     })
     .done(function(data){
@@ -121,10 +122,15 @@ $("#render.OfxImageEffectContextGenerator").click(function(){
 
 $("#render.OfxImageEffectContextFilter").click(function(){
     var pluginId = $(this).attr("pluginId");
-    console.log('Filter: ' + pluginId );
-    var renderParameters = formToJson();
+    renderFilter(pluginId)
+});
 
+
+function renderFilter(pluginId){
+    var renderParameters = formToJson();
+    console.log('Filter: ' + pluginId );
     console.log(renderParameters);
+
     // $('#resultForm').text(JSON.stringify(renderParameters));
 
     $.ajax({
@@ -138,7 +144,7 @@ $("#render.OfxImageEffectContextFilter").click(function(){
                 parameters: [
                     {
                         "id" : "filename",
-                        "value" : "/tmp/lol.png"
+                        "value" : "{RESOURCES_DIR}/"+ selectedResource
                     }
                 ]
             },{
@@ -148,7 +154,10 @@ $("#render.OfxImageEffectContextFilter").click(function(){
             },{
                 id: 2,
                 plugin: "tuttle.pngwriter",
-                parameters: []
+                parameters: [{
+                    id: "filename",
+                    value:  "{UNIQUE_OUTPUT_FILE}.png"
+                }]
             }],
 
             connections: [{
@@ -158,7 +167,7 @@ $("#render.OfxImageEffectContextFilter").click(function(){
                 src: {id: 1},
                 dst: {id: 2}
             }],
-            renderNode: {id: 2}
+            options:[],
         }),
     })
     .done(function(data){
@@ -171,6 +180,61 @@ $("#render.OfxImageEffectContextFilter").click(function(){
     .error(function(data){
         console.log('POST ERROR !');
     })
+}
+
+function getResourcesPath(){
+    var resources;
+    $.ajax({
+            type: "GET",
+            url: "/resource",
+            async: false, //avoid an empty data when result is returned.
+        })
+        .done(function(data){
+            resources =  data['resources'];
+        })
+        .error(function(data){
+            console.log('POST ERROR !');
+        });
+    return resources;
+}
+
+var allResources = getResourcesPath();
+var selectedResource = allResources[0];
+
+$(".sampleImage").each(function() { 
+    $(this).attr("src", "/resource/" + $(this).attr("id"));
+    $(this).mouseenter(function(){
+        $(this).parent().css("border", "solid 1px gray");
+    });
+    $(this).mouseleave(function(){
+        $(this).parent().css("border", "");
+    });
+
+    $(this).click(function(){
+        setResourceSelected($(this));
+        var pluginId = $("#render.OfxImageEffectContextFilter").attr("pluginId");
+        console.log($("#render.OfxImageEffectContextFilter"))
+        renderFilter(pluginId);
+
+    });
+    $(this).css("width", "100%");
+
+    $(this).parent().css("width", 200);
+    $(this).parent().css("height", 100);
+    $(this).parent().css("overflow", "hidden");
 });
+
+function setResourceSelected(obj){
+    $(".sampleImage").each(function() {
+        deselect($(this));
+    });
+    $(obj).parent().css("border", "solid 2px gray");
+    selectedResource =  $(obj).attr('id');
+}
+
+function deselect(obj){
+    $(obj).parent().css("border", "");
+}
+
 
 });
