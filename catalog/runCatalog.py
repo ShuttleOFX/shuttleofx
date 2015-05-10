@@ -188,7 +188,7 @@ def newPlugin(bundleId):
     if pluginId == None or pluginName == None:
         abort(404)
 
-    plugin = Plugin(pluginId, bundleId, pluginName)
+    plugin = Plugin(pluginId, bundleId)
     
     pluginTable.insert(plugin.__dict__)
 
