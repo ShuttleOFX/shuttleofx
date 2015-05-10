@@ -7,7 +7,7 @@ import ConfigParser
 import logging
 
 from time import sleep
-from bson import json_util
+from bson import json_util, ObjectId
 from flask import Flask, jsonify, Response, request, abort
 
 from Bundle import Bundle
@@ -20,10 +20,15 @@ currentDir = os.path.dirname(os.path.realpath(__file__))
 config = ConfigParser.ConfigParser()
 config.read('catalog.cfg')
 
+resourcesPath = os.path.join(currentDir, config.get('RESOURCES', 'resourcesDirectory'))
+if not os.path.exists(resourcesPath):
+    os.makedirs(resourcesPath)
+
 client = pymongo.MongoClient(config.get('MONGODB', 'hostname'), config.getint('MONGODB', 'port'))
 db = client.__getattr__(config.get('MONGODB', 'dbName'))
 bundleTable = db.__getattr__(config.get('MONGODB', 'bundleTable'))
 pluginTable = db.__getattr__(config.get('MONGODB', 'pluginTable'))
+resourceTable = db.__getattr__(config.get('MONGODB', 'resourceTable'))
 
 uriAnalyser = config.get('ANALYSER', 'uri')
 
@@ -52,7 +57,8 @@ def newBundle():
         abort(404)
 
     bundle = Bundle(bundleId, bundleName, userId)
-    
+    bundle.companyId = companyId
+
     bundleTable.insert(bundle.__dict__)
 
     requestResult = bundleTable.find_one({"bundleId": bundleId})
@@ -178,7 +184,7 @@ def deleteBundle(bundleId):
     if bundle == None:
         abort(404)
 
-    for plugin in bundle.plugins:
+    for pluginId in bundle.plugins:
         deleteStatus = pluginTable.remove({"pluginId":pluginId})
         if deleteStatus['n'] == 0:
             abort(404)
@@ -245,18 +251,90 @@ def getAllPlugins():
 def textSearchPlugin(keyWord, count):
     #To Do Tags
     text_results = db.command('text', config.get('MONGODB', 'pluginTable'), search = keyWord, limit=count)
-    doc_matches = (res['obj'] for res in text_results['results'])
-    return mongodoc_jsonify({"plugins": text_results['results']})
+    plugins = [ result['obj'] for result in text_results['results'] ]
+    return mongodoc_jsonify({"plugins": plugins})
 
 
 @app.route("/bundle/<int:bundleId>/plugin/<int:pluginId>")
 @app.route("/plugin/<int:pluginId>")
-def getPlugin(pluginId, bundleId=0):
+def getPlugin(pluginId, bundleId=None):
     plugin = pluginTable.find_one({"pluginId": pluginId})
     if plugin == None:
         abort(404)
 
     return mongodoc_jsonify(plugin)
+
+@app.route('/resources/', methods=['POST'])
+def addResource():
+    '''
+    Upload resource file on the database
+    '''
+
+    mimetype = request.mimetype
+    name = ""
+    size = request.content_length
+
+    if not mimetype:
+        app.logger.error("Invalide resource.")
+        abort(404)
+
+    uid = resourceTable.insert({ 
+        "mimetype" : mimetype,
+        "size" : size,
+        "name" : name})
+
+    img = request.data
+
+
+    imgFile = os.path.join(resourcesPath, str(uid))
+    f = open(imgFile, 'w')
+    f.write(img)
+    f.close()
+
+    resource = resourceTable.find_one({ "_id" : ObjectId(uid)})
+    return mongodoc_jsonify(resource)
+
+@app.route('/resources/', methods=['GET'])
+def getResources():
+    '''
+    Returns resource file from db.
+    '''
+
+    count = int(request.args.get('count', 10))
+    skip = int(request.args.get('skip', 0))
+    resources = resourceTable.find().limit(count).skip(skip)
+    return mongodoc_jsonify({"resources":[ result for result in resources ]})
+
+@app.route('/resources/<resourceId>', methods=['GET'])
+def getResourceById(resourceId):
+    '''
+    Returns resource datas from db.
+    '''
+    resourceData = resourceTable.find_one({ "_id" : ObjectId(resourceId)})
+
+    if resourceData == None:
+        abort(404)
+    return mongodoc_jsonify(resourceData)
+
+
+@app.route('/resources/<resourceId>/data', methods=['GET'])
+def getResourceData(resourceId):
+    '''
+     Returns the resource.
+    '''
+
+    resourceData = resourceTable.find_one({ "_id" : ObjectId(resourceId)})
+    if not resourceData:
+        abort(404)
+
+    filePath = os.path.join (resourcesPath, resourceId)
+
+    if not os.path.isfile(filePath):
+        abort(404)
+
+    resource = open(filePath)
+    return Response(resource.read(), mimetype=resourceData['mimetype'])
+
 
 @app.route("/plugin/<int:pluginId>/images", methods= ['POST'])
 def addImageToPlugin(pluginId):

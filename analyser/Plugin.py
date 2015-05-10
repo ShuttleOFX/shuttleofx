@@ -9,7 +9,7 @@ propTypeToPythonType = {
     tuttle.ePropTypeString: str,
 }
 
-class Plugin:
+class Plugin(object):
     def __init__(self, pluginToAnalyse):
         self.rawIdentifier = None
         self.name = None

@@ -45,11 +45,11 @@ $('.order-catag label').on('click', function() {
   // console.log(content);
   if ($(this).hasClass('ascendant')) {
   	//send catalog descendant
-  	$(this).html('<i class="fa fa-sort-alpha-desc"></i>Descendant');
+  	$(this).html('<i class="fa fa-sort-alpha-desc"></i>Descending');
   	$(this).removeClass('ascendant').addClass('descendant');
   }else{
   	//send catalog descendant
-  	$(this).html('<i class="fa fa-sort-alpha-asc"></i>Ascendant');
+  	$(this).html('<i class="fa fa-sort-alpha-asc"></i>Ascending');
   	$(this).removeClass('descendant').addClass('ascendant');
 
   };

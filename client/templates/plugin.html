@@ -2,12 +2,12 @@
 
 
 {% block title %}
-<div class="header-content" data-0="height:0px" data-150="height:0px">
+<div class="header-content" data-0="height:100px" data-150="height:0px">
     <div class="top-header">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 data-0="margin-top:-55px;font-size: 2em;" data-150="margin-top:-55px;font-size: 2em;">
+                     <h1 data-0="margin-top:25px;font-size:3em;" data-150="margin-top:-55px;font-size:2em;">
                         {% for property in plugin.properties %}
                             {% if property.name == "OfxPropShortLabel" %}
                                 {{property.value[0]}}
@@ -95,37 +95,13 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3">
-                <div class="preview-img panel panel-primary img-responsive">
-                    <img src="{{ url_for('static', filename='images/lol.png') }}">
+            {% for image in plugin.sampleImagesPath %}
+                <div class="col-md-3">
+                    <div class="preview-img panel panel-primary img-responsive">
+                        <img src="/plugin/{{plugin.pluginId}}/image/{{image}}">
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="preview-img panel panel-primary img-responsive">
-                    <img src="{{ url_for('static', filename='images/lol.png') }}">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="preview-img panel panel-primary img-responsive">
-                    <img src="{{ url_for('static', filename='images/lol.png') }}">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="preview-img panel panel-primary img-responsive">
-                    <img src="{{ url_for('static', filename='images/lol.png') }}">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="preview-img panel panel-primary img-responsive">
-                    <img src="{{ url_for('static', filename='images/lol.png') }}">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="preview-img panel panel-primary img-responsive">
-                    <img src="{{ url_for('static', filename='images/lol.png') }}">
-                </div>
-            </div>
-            
+            {% endfor %}
         </div>
 
         <div class="row">

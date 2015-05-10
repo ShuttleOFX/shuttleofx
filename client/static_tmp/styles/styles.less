@@ -19,7 +19,7 @@ html,body{
 }
 
 .main-content{
-    padding-top: 2em;
+    padding-top: 120px;
     z-index: 2;
 }
 
@@ -226,13 +226,14 @@ header{
 
 .header-content{
     padding-right: 265px;
+    height:100px;
     color: #fff;
     width: 100%;
     background: @ofxColor;
     h1{
         color: #fff;
-        line-height: 1;
-        font-size: 3.5em;
+        margin-top: 25px;
+        font-size: 3em;
         font-family: 'Roboto-Light';
     }
     p{
@@ -317,16 +318,18 @@ ul.right-nav li .fa{
     // padding-bottom: 100px;
     overflow-y: scroll;
     .mainLogo{
-        background-color: #009688;
-        padding: 3px;
-        text-align: center;
-        margin: 0px auto;
+        height: 79px;
+        background-color: rgba(0, 0, 0, 0.07);
+        // margin-bottom: -15px;
+        padding-top: 10px;
         img{
-            height: 73px;
+            height: 60px;
+            margin-left: 30px;
             display: inline-block;
         }
-        a{
-            color: #fff !important;
+        span{
+            margin: 5px;
+            color: @ofxColor!important;
         }
     }
     .input-field{
@@ -358,8 +361,8 @@ ul.right-nav li .fa{
     img.signedIn{
         margin-top: 30px;
         margin-left: 30px;
-        width: 50px;
-        height: 50px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
     }
 
@@ -418,6 +421,7 @@ ul.right-nav li .fa{
                 margin-left: 0px;
                 height: 1px;
                 background: #ccc;
+
                 h4{
                     position: absolute;
                     margin-top: -8px;

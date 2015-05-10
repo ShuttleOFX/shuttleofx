@@ -4,6 +4,9 @@ bundleStore: bundle
 [ANALYSER]
 uri: http://0.0.0.0:5004
 
+[RESOURCES]
+resourcesDirectory = resourcesDirectory
+
 [MONGODB]
 hostname: localhost
 port: 27017

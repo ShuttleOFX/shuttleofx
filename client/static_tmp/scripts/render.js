@@ -72,8 +72,7 @@ function formToJson()
 
 
 $("#render.OfxImageEffectContextGenerator").click(function(){
-    $('#viewer-placeholder').hide();
-    $('#viewer img').css({height: "auto"});
+    
     var pluginId = $(this).attr("pluginId");
     console.log('Generator: ' + pluginId );
     var renderParameters = formToJson();
@@ -114,6 +113,7 @@ $("#render.OfxImageEffectContextGenerator").click(function(){
         $("#download-view").attr("href", "/render/" + data.render.id + "/resource/" + data.render.outputFilename);
         $("#download-view").removeClass('disabled');
         $("#viewer-placeholder").css('display', 'none');
+        $('.display img').css({height: "auto"});
     })
     .error(function(data){
         console.log('POST ERROR !');
@@ -176,6 +176,7 @@ function renderFilter(pluginId){
         $("#download-view").attr("href", "/render/" + data.render.id + "/resource/" + data.render.outputFilename);
         $("#download-view").removeClass('disabled');
         $("#viewer-placeholder").css('display', 'none');
+        $('.display img').css({height: "auto"});
     })
     .error(function(data){
         console.log('POST ERROR !');

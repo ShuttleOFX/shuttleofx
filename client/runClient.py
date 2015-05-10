@@ -73,7 +73,7 @@ def index():
     return render_template("index.html")
 
 @app.route('/plugin')
-def getPlugins(pluginName=None):
+def getPlugins():
     user = None
     if 'google_token' in session:
         user = google.get('userinfo').data
@@ -91,6 +91,11 @@ def getPlugin(pluginId):
         user = google.get('userinfo').data
     resp = requests.get(catalogRootUri+"/plugin/"+pluginId)
     return render_template('plugin.html', plugin=resp.json(), user=user)
+
+@app.route('/plugin/<pluginId>/image/<imageId>')
+def getSampleImagesForPlugin(pluginId, imageId):
+    req = requests.get(catalogRootUri + "/resources/" + str(imageId) + "/data")
+    return Response(req.content, mimetype=req.headers["content-type"])
 
 @app.route('/editor')
 def renderPage():
@@ -145,10 +150,8 @@ def getResources() :
 @login_required
 def upload():
     if 'google_token' in session:
-        me = google.get('userinfo')
-        return render_template("upload.html", user=me.data)
-        
-        return jsonify({"data": me.data})
+        user = google.get('userinfo')
+        return render_template("upload.html", user=user.data)
     return redirect(url_for('login'))
     #return render_template('upload.html', uploaded=None)
 
@@ -195,10 +198,8 @@ def authorized():
         )
     print resp
     session['google_token'] = (resp['access_token'], '')
-    me = google.get('userinfo')
-    return render_template("index.html", user=me.data)
-    return jsonify({"data": me.data})
-
+    user = google.get('userinfo')
+    return render_template("index.html", user=user.data)
 
 @google.tokengetter
 def get_google_oauth_token():

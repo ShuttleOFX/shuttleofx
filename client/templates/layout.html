@@ -2,10 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Armand Biteau, Juliette Belin, Hugo Garrido">
     <title>ShuttleOFX</title>
+
+    <meta property="og:title" content="ShuttleOFX" />
+    <meta property="og:description" content="Create, share and play online with image processing plugins." />
+    <meta property="og:url" content="http://shuttleofx.no-ip.org/" />
+    <meta property="og:image" content="http://shuttleofx.no-ip.org/static/images/logo2.png" />
 
     <!-- Styles -->
     <link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,700' rel='stylesheet' type='text/css'>
@@ -32,8 +37,8 @@
     <div id="left-nav">
         <a href="/">
             <div class="mainLogo">
-                <img src="{{ url_for('static', filename='images/logo.png') }}">
-                <a href="/">ShuttleOFX</a>
+                <img src="{{ url_for('static', filename='images/logo2.png') }}">
+                <span>ShuttleOFX</span>
             </div>
         </a>
         <ul>
@@ -53,7 +58,7 @@
                 </li>
             {% endif %}
 
-            <li class="title-nav"><h4>NAVIGATION</h4></li>
+            <li class="title-nav" style="margin-top:2em;"><h4>NAVIGATION</h4></li>
             {% if user %}
             <li>
                 <a href='/upload'><i class="fa fa-cloud-upload"></i>Upload new plugins</a>
