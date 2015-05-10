@@ -35,6 +35,14 @@
                         <a href="/plugin"><i class="fa fa-angle-left"></i> Back to all plugins</a>
                         {% set urldemo = plugin.uri %}
                         {% set urldemo = urldemo[9:] %}
+                        
+
+                    {% set countContext = 0 %}
+                    {% for property in plugin.properties %}
+                    {% if property.name == "OfxImageEffectPropSupportedContexts" %}
+                        {% for context in property.value if countContext == 0 and context in ("OfxImageEffectContextFilter", "OfxImageEffectContextGenerator") %}
+
+                            {% set countContext = 1 %}
                         <a href="/editor/{{plugin.pluginId}}" class="btn btn-primary btn-render-navbar">
                             <i class="fa fa-rocket" style="padding-right: 7px"></i>
                             Live demo of 
@@ -44,6 +52,10 @@
                                 {% endif %}
                             {% endfor %}</span>
                         </a>
+                    
+                        {% endfor%}
+                    {% endif %}
+                {% endfor %}
                     </div>
                 </div>
             </div>
