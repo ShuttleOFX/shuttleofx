@@ -1,10 +1,10 @@
 
 
-class Plugin:
-    def __init__(self, pluginId, bundleId):
+class Plugin(object):
+    def __init__(self, pluginId, bundleId, pluginName=""):
         self.pluginId = pluginId
         self.bundleId = bundleId
-        self.name = None
+        self.name = pluginName
         self.shortName = None
         self.description = ""
         self.shortDescription = ""
@@ -30,18 +30,18 @@ class Plugin:
     def setRating(self, val):
         self.rate = val
 
-    def getRating(sefl):
+    def getRating(self):
         return self.rate
 
-    def addSampleImages(sefl, paths):
+    def addSampleImages(self, paths):
         if isinstance(paths, str):
             self.sampleImagesPath.append(paths)
 
         if isinstance(paths, list):
-            for path in paths :
+            for path in paths:
                 self.sampleImagesPath.append(path)
 
-    def printBundle():
+    def printBundle(self):
         print "Plugin :"
         print "pluginId:", self.pluginId
         print "bundleId:", self.bundleId

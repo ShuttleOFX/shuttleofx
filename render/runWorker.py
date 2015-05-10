@@ -22,6 +22,7 @@ g_rendersSharedInfo = {}
 # Pool for rendering jobs
 # processes=None => os.cpu_count()
 g_pool = multiprocessing.Pool(processes=4)
+g_enablePool = False
 
 # Manager to share rendering information
 g_manager = multiprocessing.Manager()
@@ -93,8 +94,10 @@ def newRender():
     renderSharedInfo['status'] = 0
     g_rendersSharedInfo[renderID] = renderSharedInfo
 
-    #g_pool.apply(renderScene.computeGraph, args=[renderSharedInfo, newRender])
-    renderScene.computeGraph(renderSharedInfo, newRender)
+    if g_enablePool:
+        g_pool.apply(renderScene.computeGraph, args=[renderSharedInfo, newRender])
+    else:
+        renderScene.computeGraph(renderSharedInfo, newRender)
     
     return jsonify(render=newRender)
 
@@ -187,7 +190,6 @@ def getResource(resourceId):
     '''
     Returns resource file.
     '''
-
     global g_listImg
 
     print json.dumps(g_listImg, indent=4)

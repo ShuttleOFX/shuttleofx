@@ -1,6 +1,5 @@
 import os
 import sys
-import shutil
 import tarfile
 import logging
 import threading
@@ -101,7 +100,9 @@ def analyse(pluginPath):
 
 def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
     '''
-    Launches the analyse. Set the process status and fill sharedBundleDatas with the analysed bundle datas. Delete temporary files and directories created during the archive extraction.
+    Launches the analyse.
+    Set the process status and fill sharedBundleDatas with the analysed bundle datas.
+    Delete temporary files and directories created during the archive extraction.
     '''
 
     sharedBundleDatas['status'] = 'running'
