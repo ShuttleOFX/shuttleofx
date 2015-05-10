@@ -168,7 +168,7 @@ def deleteBundle(bundleId):
     if bundle == None:
         abort(404)
 
-    for plugin in bundle.plugins:
+    for pluginId in bundle.plugins:
         deleteStatus = pluginTable.remove({"pluginId":pluginId})
         if deleteStatus['n'] == 0:
             abort(404)
@@ -188,7 +188,7 @@ def newPlugin(bundleId):
     if pluginId == None or pluginName == None:
         abort(404)
 
-    plugin = Plugin(pluginId, bundleId, pluginName)
+    plugin = Plugin(pluginId, bundleId)
     
     pluginTable.insert(plugin.__dict__)
 
