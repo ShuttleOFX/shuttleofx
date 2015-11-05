@@ -15,7 +15,6 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
     project: {
       static: 'static_tmp',
-      static_dist: 'static_dist',
       static_tmp: 'static'
     },
 
@@ -110,16 +109,6 @@ module.exports = function (grunt) {
 
     // Empties folders to start fresh
     clean: {
-      static_dist: {
-        files: [{
-          dot: true,
-          src: [
-            '<%= project.static_dist %>/*',
-            '!<%= project.static_dist %>/.git*',
-            '!<%= project.static_dist %>/Procfile'
-          ]
-        }]
-      },
       server: '<%= project.static_tmp %>'
     },
 
@@ -128,14 +117,6 @@ module.exports = function (grunt) {
       options: {
         browsers: ['last 1 version']
       },
-      static_dist: {
-        files: [{
-          expand: true,
-          cwd: '<%= project.static_tmp %>/styles/',
-          src: '{,*/}*.css',
-          dest: '<%= project.static_tmp %>/styles/'
-        }]
-      }
     },
 
     // Reads HTML for usemin blocks to enable smart builds that automatically
@@ -149,14 +130,9 @@ module.exports = function (grunt) {
     },
 
     // Performs rewrites based on rev and the useminPrepare configuration
-    usemin: {
+  usemin: {
       html: ['templates/{,*/}*.html'],
-      css: ['<%= project.static_dist %>/styles/{,*/}*.css'],
-      js: ['<%= project.static_dist %>/scripts/{,*/}*.js'],
       options: {
-        assetsDirs: [
-          '<%= project.static_dist %>'
-        ],
         // This is so we update image references in our ng-templates
         patterns: {
           js: [
@@ -168,43 +144,6 @@ module.exports = function (grunt) {
 
     // Copies remaining files to places other tasks can use
     copy: {
-      static_dist: {
-        files: [{
-          expand: true,
-          dot: true,
-          cwd: '<%= project.static_tmp %>/',
-          dest: '<%= project.static_dist %>/',
-          src: [
-            '*.{ico,png,txt}',
-            'images/{,*/}*.{webp}',
-            'images/*.jpg',
-            'images/*.png',
-            'images/*.gif',
-            'images/**/*.jpg',
-            'images/**/*.png',
-            'images/**/*.svg',
-
-            'fonts/**/*',
-            'styles/*.css',
-            'styles/vendor/*.css',
-            'styles/vendor/*.map',
-
-            'scripts/*.js',
-            'scripts/vendor/*.js',
-
-            'sub/*.vtt'
-
-
-          ]
-        }, {
-          expand: true,
-          cwd: '<%= project.static_tmp %>/images/',
-          dest: '<%= project.static_dist %>/images/',
-          src: ['generated/*']
-        }]
-      },
-      
-
       static_tmp: {
         files: [{
           expand: true,
@@ -228,10 +167,6 @@ module.exports = function (grunt) {
             'scripts/*.js',
 
             'sub/*.vtt'
-
-
-
-
           ]
         }]
       }
@@ -243,18 +178,7 @@ module.exports = function (grunt) {
       server: [
         'less',
         'concat:scripts'
-
       ],
-      test: [
-        'less',
-        'concat:scripts'
-
-      ],
-      static_dist: [
-        'less',
-        'concat:scripts'
-
-      ]
     },
 
 
@@ -289,11 +213,7 @@ module.exports = function (grunt) {
     this.async();
   });
 
-  grunt.registerTask('serve', function (target) {
-    if (target === 'static_dist') {
-      return grunt.task.run(['build', 'env:all', 'env:prod', 'wait']);
-    }
-
+  grunt.registerTask('serve', function () {
     grunt.task.run([
       'clean:server',
       'concurrent:server',
@@ -311,9 +231,8 @@ module.exports = function (grunt) {
 
 
   grunt.registerTask('build', [
-    'clean:static_dist',
-    'concurrent:static_dist',
     'useminPrepare',
+    'concurrent:server',
     'autoprefixer',
     'copy:static_tmp',
     'usemin'
