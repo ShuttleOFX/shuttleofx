@@ -125,6 +125,7 @@ $(document).ready(function() {
             $("#viewer img").attr("src", "/render/" + data.render.id + "/resource/" + data.render.outputFilename);
             $("#download-view").removeClass('disabled');
             $('#viewer .preloader-wrapper').removeClass('active');
+            $("#viewer-placeholder").removeClass('overlay');
             $("#viewer-placeholder").css('display', 'none');
             $('.display img').css({height: "auto"});
 
@@ -211,6 +212,7 @@ $(document).ready(function() {
             $("#viewer img").attr("src", "/render/" + data.render.id + "/resource/" + data.render.outputFilename);
             $("#download-view").removeClass('disabled');
             $('#viewer .preloader-wrapper').removeClass('active');
+            $("#viewer-placeholder").removeClass('overlay');
             $("#viewer-placeholder").css('display', 'none');
             $('.display img').css({height: "auto"});
 
@@ -322,11 +324,13 @@ $(document).ready(function() {
     $("#render.OfxImageEffectContextFilter").click(function(){
         $('#viewer .preloader-wrapper').addClass('active');
         $("#viewer-placeholder").css('display', 'block');
+        $("#viewer-placeholder").addClass('overlay');
         renderFilter($(this).attr("pluginId"));
     });
     $("#render.OfxImageEffectContextGenerator").click(function(){
         $('#viewer .preloader-wrapper').addClass('active');
         $("#viewer-placeholder").css('display', 'block');
+        $("#viewer-placeholder").addClass('overlay');
         renderGenerator($(this).attr("pluginId"));
     });
 });
