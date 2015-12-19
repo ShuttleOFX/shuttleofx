@@ -217,33 +217,31 @@ def getAllPlugins():
     if skip:
         skip = int(skip)
 
+    pipeline = [
+        {"$sort": SON([("version.major",-1), ("version.minor",-1)])},
+        {"$group": {
+            "_id": "$rawIdentifier",
+            "plugin": {"$first": "$$ROOT"}, # retrieve the first plugin
+            }
+        },
+        {"$sort": {"plugin.label":alphaSort}}
+        ]
+
     if keyWord:
         logging.info("search: " + keyWord)
         searchRegex = re.compile(".*{search}.*".format(search=keyWord.replace("*", ".*")))
         searchKeys = ["label", "rawIdentifier", "shortDescription", "description", "properties.OfxPropPluginDescription.value"]
-        cursor = config.pluginTable.find(
-            {"$or":  # Search on multiple keys
-                [{searchKey: searchRegex} for searchKey in searchKeys]
-            })
-    else:
-        # cursor = config.pluginTable.find()
-        pipeline = [
-            {"$sort": SON([("version.major",-1), ("version.minor",-1)])},
-            {"$group": {
-                "_id": "$rawIdentifier",
-                "plugin": {"$first": "$$ROOT"}, # retrieve the first plugin
-                }
-            },
-            {"$sort": {"plugin.label":alphaSort}}
-            ]
-        cursor = list(config.pluginTable.aggregate(pipeline))
+        match = {"$match": {"$or" : [{searchKey: searchRegex} for searchKey in searchKeys]}}
+        pipeline.insert(0, match)
+
+    cursor = list(config.pluginTable.aggregate(pipeline))
 
     if count and skip:
         filteredCursor = cursor[(skip-1)*count : skip*count]
     else:
         filteredCursor = cursor
 
-    totalPlugins = len(cursor);
+    totalPlugins = len(cursor)
     plugins = [result["plugin"] for result in filteredCursor]
 
     return mongodoc_jsonify({"plugins": plugins, "totalPlugins" : totalPlugins})
