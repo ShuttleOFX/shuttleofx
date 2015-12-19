@@ -6,12 +6,17 @@ import atexit
 import logging
 import tempfile
 import multiprocessing
+import mimetypes
 
 from flask import request, jsonify, send_file, abort, Response, make_response
 from bson import json_util, ObjectId
 
 import config
 import renderScene
+
+mimetypes.init()
+mimetypes.add_type('image/bmp','.bmp')
+mimetypes.add_type('image/x-panasonic-raw', '.raw')
 
 # list of all computing renders
 g_renders = {}
@@ -25,29 +30,10 @@ g_enablePool = False
 # Manager to share rendering information
 g_manager = multiprocessing.Manager()
 
+
+
 def mongodoc_jsonify(*args, **kwargs):
     return Response(json.dumps(args[0], default=json_util.default), mimetype='application/json')
-
-def remapPath(datas):
-    '''
-    Replace PATTERNS with real filepaths.
-    '''
-    outputResources = []
-    for node in datas['nodes']:
-        for parameter in node['parameters']:
-            logging.warning('param: %s %s', parameter['id'], parameter['value'])
-            if isinstance(parameter['value'], (str, unicode)):
-
-                if '{RESOURCES_DIR}' in parameter['value']:
-                    parameter['value'] = parameter['value'].replace('{RESOURCES_DIR}', config.resourcesPath)
-
-                if '{UNIQUE_OUTPUT_FILE}' in parameter['value']:
-                    prefix, suffix = parameter['value'].split('{UNIQUE_OUTPUT_FILE}')
-                    _, tmpFilepath = tempfile.mkstemp(prefix=prefix, suffix=suffix, dir=config.renderDirectory)
-                    outputResources.append(os.path.basename(tmpFilepath))
-                    parameter['value'] = tmpFilepath
-
-    return outputResources
 
 
 @config.g_app.route('/')
@@ -59,17 +45,16 @@ def newRender():
     '''
     Create a new render and return graph information.
     '''
-
-    datas = request.json
+    inputScene = request.json
     renderID = str(uuid.uuid1())
     logging.info("RENDERID: " + renderID)
-    outputResources = remapPath(datas)
+    scene, outputResources = renderScene.convertScenePatterns(inputScene)
 
     newRender = {}
     newRender['id'] = renderID
     # TODO: return a list of output resources in case of several writers.
     newRender['outputFilename'] = outputResources[0]
-    newRender['scene'] = datas
+    newRender['scene'] = scene
     g_renders[renderID] = newRender
 
     config.g_app.logger.debug('new resource is ' + newRender['outputFilename'])
@@ -78,10 +63,15 @@ def newRender():
     renderSharedInfo['status'] = 0
     g_rendersSharedInfo[renderID] = renderSharedInfo
 
-    if g_enablePool:
-        g_pool.apply(renderScene.launchComputeGraph, args=[renderSharedInfo, newRender])
+    outputFilesExist = all([os.path.exists(os.path.join(config.renderDirectory, f)) for f in outputResources])
+    if not outputFilesExist:
+        if g_enablePool:
+            g_pool.apply(renderScene.launchComputeGraph, args=[renderSharedInfo, newRender])
+        else:
+            renderScene.launchComputeGraph(renderSharedInfo, newRender)
     else:
-        renderScene.launchComputeGraph(renderSharedInfo, newRender)
+        # Already computed
+        renderSharedInfo['status'] = 3
 
     return jsonify(render=newRender)
 
@@ -149,6 +139,7 @@ def addResource():
         abort(make_response("Empty request", 500))
 
     mimetype = request.files['file'].content_type
+    logging.debug("mimetype = " + mimetype)
 
     if not mimetype:
         logging.error("Invalid resource.")
@@ -157,9 +148,16 @@ def addResource():
     uid = config.resourceTable.insert({
         "mimetype" : mimetype,
         "size" : request.content_length,
-        "name" : request.files['file'].filename})
+        "name" : request.files['file'].filename,
+        "registeredName" : ""})
 
-    imgFile = os.path.join(config.resourcesPath, str(uid))
+    _, extension = os.path.splitext(request.files['file'].filename)
+    if not extension:
+        extension = mimetypes.guess_extension(mimetype)
+    imgFile = str(uid) + extension
+    config.resourceTable.update({"_id" : uid}, {"registeredName" : imgFile})
+    imgFile = os.path.join(config.resourcesPath, imgFile)
+    
     file = request.files['file']
     file.save(imgFile)
 

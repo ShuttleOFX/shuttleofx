@@ -178,7 +178,6 @@ $(document).ready(function() {
             data: JSON.stringify({
                 nodes: [{
                     id: 0,
-                    plugin: "tuttle.pngreader",
                     parameters: [
                         {
                             "id" : "filename",
@@ -225,7 +224,6 @@ $(document).ready(function() {
             data: JSON.stringify({
                 nodes: [{
                     id: 0,
-                    plugin: "tuttle.pngreader",
                     parameters: [
                         {
                             "id" : "filename",
@@ -281,7 +279,7 @@ $(document).ready(function() {
         allResources = [];
 
         $.each( data.resources, function( index, resource){
-            allResources.push(resource['_id']['$oid']);
+            allResources.push(resource['registeredName']);
         });
 
         if(allResources !== undefined && allResources.length > 0){
