@@ -82,7 +82,7 @@ def newRender():
         g_pool.apply(renderScene.launchComputeGraph, args=[renderSharedInfo, newRender])
     else:
         renderScene.launchComputeGraph(renderSharedInfo, newRender)
-    
+
     return jsonify(render=newRender)
 
 
@@ -162,7 +162,7 @@ def addResource():
     imgFile = os.path.join(config.resourcesPath, str(uid))
     file = request.files['file']
     file.save(imgFile)
-    
+
     resource = config.resourceTable.find_one({ "_id" : ObjectId(uid)})
     return mongodoc_jsonify(resource)
 

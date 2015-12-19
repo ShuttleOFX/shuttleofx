@@ -34,15 +34,33 @@ $("#searchForm").find("#searchquery").blur(
 
 $('[data-toggle]').on('click', function() {
   var toggle;
-  toggle = $(this).addClass('active').attr('data-toggle');
+  
+  toggle = $(this).addClass('active').data('toggle');
   $(this).siblings('[data-toggle]').removeClass('active');
-  return $('.surveys').removeClass('grid list').addClass(toggle);
+  $('.surveys').removeClass('grid list').addClass(toggle);
+
+  // Change the way images are displayed if there is a preview
+  $(".surveys li:has(img.custom)").each(function(){
+  	var title = $(this).find("h3");
+  	var pluginsDiv = $(this).find(".plugins-titles, .plugins-infos");
+
+    if (toggle == "list") {
+      // In list mode, move h3 to the next div in order to isolate the img 
+      // so we can have the image on the left and the title and description on the right
+  	  title.detach().prependTo($(this).find(".plugins-infos"));
+  	  pluginsDiv.css({"display": "table-cell", "vertical-align": "middle"}).redrawForWebkit();
+  	} else {
+  	  // In grid view, go back to the original layout
+  	  title.detach().appendTo($(this).find(".plugins-titles"));
+  	  pluginsDiv.css({"display": "inline-block", "vertical-align": ""});
+  	}
+  });
 });
 
 
 $('.order-catag label').on('click', function() {
   var content = $(this).html();
-  // console.log(content);
+
   if ($(this).hasClass('ascendant')) {
   	//send catalog descendant
   	$(this).html('<i class="fa fa-sort-alpha-desc"></i>Descending');
@@ -56,6 +74,15 @@ $('.order-catag label').on('click', function() {
   
 });
 
+// Force webkit browsers to redraw style changes
+// see : http://stackoverflow.com/a/3485654
+(function($) {
+    $.fn.redrawForWebkit = function() {
+        this[0].style.display = 'none';
+        this[0].offsetHeight;
+        this[0].style.display = 'table-cell';
+    };
+})(jQuery);
 
 
 /*

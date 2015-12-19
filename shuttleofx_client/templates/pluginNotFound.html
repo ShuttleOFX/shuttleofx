@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+<div class="header-content" data-0="height:100px" data-150="height:0px">
+    <div class="top-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 data-0="margin-top:25px;font-size:3em;" data-150="margin-top:-55px;font-size:2em;">
+                        Plugin not found
+                    </h1>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block subtitle %}
+<div class="bottom-header">
+    <div class="navbar navbar-default">
+        <div class="navbar-collapse collapse navbar-responsive-collapse-filter">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="/plugin"><i class="fa fa-angle-left"></i> Back to all plugins</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="main-content" id="plugins">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="filter-page">
+                    <h3><i class="fa fa-meh-o"></i> Uh oh... It seems that the plugin you requested does no longer exist.
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

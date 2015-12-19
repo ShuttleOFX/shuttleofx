@@ -6,13 +6,15 @@ var myDropzone = undefined;
 
 $("#droparea").hide();
 $('#fileSubmit').hide();
+$('#upload_feeback').hide();
+
 
 $(function(){
     var wofxDropzone = new Dropzone("#droparea", {
         url: "undefinedUrl",
         acceptedFiles: "application/zip, application/x-tar, application/gzip, application/x-gzip",
         maxFilesize: 1024,
-        paramName: "file"
+        paramName: "file",
     });
 
     wofxDropzone.options.previewTemplate = '\
@@ -27,12 +29,20 @@ $(function(){
         </div>';
 
     $('#fileSubmit').click(function(){
-        //wofxDropzone.options.headers={"Content-Type": wofxDropzone.files[0].type};
-        wofxDropzone.processQueue();
+        console.log(wofxDropzone.getQueuedFiles().length)
+        if (wofxDropzone.getQueuedFiles().length > 0) {
+            wofxDropzone.processQueue();
+        }else{
+            $('#message').html('You have forgotten to attach your file !')
+            $('#upload_feedback').show();
+        }
     });
 
     $('#metaBundle').submit(function(event, bundleId){
-      
+        event.preventDefault();
+
+        $('#upload_feedback').hide();
+
         bundleName = $("#bundleName").val();
         bundleDescription = $("#bundleDescription").val();
         var userId = $("#createBundle").attr("attr-id");
@@ -50,23 +60,38 @@ $(function(){
             bundleId = data.bundleId;
             var bundleURI = "/bundle/"+bundleId+"/archive";
             wofxDropzone.options.url = bundleURI;
-            console.log(bundleId);
-
+            //console.log("bundleId "+bundleId);
 
             wofxDropzone.on('success', function(){
-                console.log("success biatch");
-                console.log(bundleId);
                 var bundleAnalyseURI = '/bundle/'+bundleId+'/analyse';
                 $.ajax({
                     type : 'POST',
                     url : bundleAnalyseURI,
-                    data : {"bundleId" : bundleId}
+                    data : {"bundleId" : bundleId},
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        console.log("Status: " + textStatus + "Error: " + errorThrown); 
+
+                        $("h2").html("Oops... something went wrong !")
+                        $("#metaBundle").hide();
+                        $("#droparea").hide();
+                        $('#fileSubmit').hide();
+                        $("#createBundle").hide();
+                        $('#message').html('Your bundle is invalid.')
+                        $('#upload_feedback').show();
+                    }
                 }).done(function(){
-                    console.log("lol");
+                    console.log("upload done.");
+                    $("h2").html("Congratulations !")
+                    $("#metaBundle").hide();
+                    $("#droparea").hide();
+                    $('#fileSubmit').hide();
+                    $("#createBundle").hide();
+                    $('#message').html('Your bundle has been successfully uploaded ! <i class="fa fa-rocket"></i>')
+                    $('#upload_feedback').show();
                 })
             });
         });
-        event.preventDefault();
     });
 });
+
 

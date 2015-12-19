@@ -37,7 +37,6 @@
 
 {% block content %}
 
-{% if uploaded == None  %}
     <div class="main-content">
         <div class="container-fluid">
             <div class="row">
@@ -67,21 +66,17 @@
                 </div>
             </div>
             <!-- <div id="selectImage"><a href="#">Select folder</a></div> -->
-            <div id="fileSubmit"><a href="" class="btn btn-primary">Upload bundle</a></div>
+            <div id="fileSubmit"><a href="#" class="btn btn-primary">Upload bundle</a></div>
         </div>
     </div>
-{% else %}
-    <div class="main-content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    LOL
-                </div>
+
+    <div class="container-fluid" id="upload_feedback">
+        <div class="row">
+            <div class="col-md-12">
+                <p id="message"></p>
             </div>
         </div>
     </div>
-{% endif %}
-
 
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="{{ url_for('static', filename='scripts/vendor/dropzone.js') }}"></script>

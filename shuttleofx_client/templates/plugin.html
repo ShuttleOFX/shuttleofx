@@ -34,7 +34,7 @@
                             {% if "OfxImageEffectContextFilter" in supportedContexts or
                                "OfxImageEffectContextGenerator" in supportedContexts
                                %}
-                                <a href="/editor/{{plugin.pluginId}}" class="btn btn-primary btn-render-navbar">
+                                <a href="/editor/{{plugin.rawIdentifier}}" class="btn btn-primary btn-render-navbar">
                                     <i class="fa fa-rocket" style="padding-right: 7px"></i>
                                     Live demo of 
                                     <span class="calltolive">{{ plugin.shortLabel }}</span>
@@ -305,6 +305,5 @@
         </div>
     </div>
 </div>
-<script src="{{ url_for('static', filename='scripts/vendor/dropzone.js') }}"></script>
 {% endif %}
 {% endblock %}

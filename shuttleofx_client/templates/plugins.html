@@ -58,13 +58,14 @@
                         <div class="col-md-4 pull-right">
                             <div id="filter-page">
                                 <p class="pager-size">
-                                    Plugins per page: 
+                                    Plugins per page:
                                     <select name="size" class="" id="pageSize">
-                                        <option value="10">10</option>
-                                        <option value="20" selected>20</option>
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
                                         <option value="30">30</option>
                                         <option value="40">40</option>
                                     </select>
+                                    <input id="totalPlugins" type="hidden" name="totalPlugins" value="{{ dico.totalPlugins }}">
                                 </p>
                             </div>
                         </div>
@@ -85,8 +86,8 @@
             <div class="col-md-12">
                 <div id="filter-page">
                     <ul class="pagination pagination-sm pager-check">
-                        <li id="previous"><a href="javascript:void(0)">«</a></li>
-                        <li id="next"><a href="javascript:void(0)">»</a></li>
+                        <li id="previous"><a href="">«</a></li>
+                        <li id="next"><a href="">»</a></li>
                     </ul>
                 </div>
             </div>
@@ -95,15 +96,18 @@
             <ul class="surveys grid">
                 {% for plugin in dico.plugins %}
                     <li class="col-md-3">
-                        <a href="/plugin/{{plugin.pluginId}}">
+                        <a href="/plugin/{{plugin.rawIdentifier}}">
                         <div class="panel panel-primary">
                                 <div class="plugins-titles">
                                     {% if plugin.sampleImagesPath|length != 0 %}
                                         {% set image = plugin.sampleImagesPath[0] %}
-                                    <div class="plugin-thumbnail {{image}}"></div>
+                                        {% set imagePath = "/plugin/" ~ plugin.pluginId ~ "/image/" ~ image %}
+                                        {% set class = "custom" %}
                                     {% else %}
-                                    <img src="{{ url_for('static', filename='images/logoPad.png') }}" alt="" class="img-responsive plugin-thumbnail" />
+                                        {% set imagePath = url_for('static', filename='images/logoPad.png') %}
+                                        {% set class = "" %}
                                     {% endif %}
+                                    <img src="{{ imagePath }}" alt="" class="img-responsive plugin-thumbnail {{ class }}" />
                                     <h3 class="panel-title">
                                         {{plugin.label}}
                                     </h3>
