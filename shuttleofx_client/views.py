@@ -42,6 +42,13 @@ def getPlugins():
 
     return render_template('plugins.html', dico=resp.json(), user=user)
 
+@config.g_app.route('/informations')
+def getInfos():
+    user = None
+    if 'google_token' in session:
+        user = config.google.get('userinfo').data
+        return render_template('whatIsOFX.html', user=user)
+    return render_template('whatIsOFX.html', user=user)
 
 @config.g_app.route("/plugin/search/")
 def searchPlugins():

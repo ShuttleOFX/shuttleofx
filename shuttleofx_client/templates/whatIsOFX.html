@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}
+<div class="header-content" data-0="height:100px" data-150="height:0px">
+    <div class="top-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 data-0="margin-top:25px;font-size:3em;" data-150="margin-top:-55px;font-size:2em;">
+                        About OpenFX
+                    </h1>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block subtitle %}
+<div class="bottom-header">
+    <div class="navbar navbar-default">
+        <div class="navbar-collapse collapse navbar-responsive-collapse-filter">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="/plugin"><i class="fa fa-angle-left"></i> Back to all plugins</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="main-content" id="plugins">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="filter-page">
+                    <h2>What if Open FX ?</h2>
+                    <p>
+                        OFX is actually several things.
+                        At the lowest level OFX is a generic C based plug-in architecture that can be used to
+                        define any kind of plug-in API. You could use this low level architecture to implement
+                        any API.
+                        The basic architecture could be re-used to create other higher level APIs such as a sound
+                        effects API, a 3D API and more.
+                    </p>
+                    <p>
+                        This guide describes the basic OFX plug-in architecture and the visual effects plug-in
+                        API built on top of it.
+                        The visual effects API is very broad and intended to allow visual effects plug-ins to work
+                        on a wide range of host applications, including compositing hosts, rotoscopers, encoding
+                        applications, colour grading hosts, editing hosts and more I haven’t thought of yet.
+                        While all these type of applications process images, they often have very different work
+                        flows and present effects to a user in incompatible ways. OFX is an attempt to deal with
+                        all of these in a clear and consistent manner.
+                    </p>
+                    <p>
+                        The API is by design feature rich, not all aspects of the API map to all hosts.
+                        This is to allow different host developers to implement OFX support in a manner that
+                        best fits their applications' capabilities.
+                    </p>
+                    <p>
+                        Hosts are encouraged to extend OFX by providing extra proprietary suites,
+                        actions, properties and settings to extend the capabilities of the API.
+                        It would be nice that a broadly useful proprietary extension be put forward
+                        for incorporation into the open standard.
+                    </p>
+                    <p>
+                        That said although there is no validation process in terms of what is an OFX host,
+                        a small minimal set of expectations is assumed, which we will cover in the following guides.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
