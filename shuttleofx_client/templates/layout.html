@@ -23,7 +23,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='images/favicon-96x96.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
-    
+
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
@@ -72,6 +72,9 @@
                 <a href='/upload'><i class="fa fa-cloud-upload"></i>Upload new plugins</a>
             </li>
             {% endif %}
+            <li>
+                <a href='/informations'><i class="fa fa-info"></i>About OpenFX</a>
+            </li>
             <li class="title-nav"><h4>MORE</h4></li>
             <!--
             <li>
@@ -146,7 +149,7 @@
     if($('#addThumbForm').length > 0){
 
         var pluginId = $("#addGalleryImage").attr("attr-id");
-       
+
         var thumDropzone = new Dropzone("#addThumbForm", {
             url : '/plugin/0/resource',
             acceptedFiles: "image/jpeg, image/png, image/gif, image/pict",
@@ -160,13 +163,13 @@
             thumDropzone.options.url = '/plugin/'+pluginId+'/resource';
 
             thumDropzone.processQueue();
-            
+
             thumDropzone.on('success', function(data){
 
                 data = JSON.parse(data.xhr.response);;
-                
+
                 var imageId = data._id["$oid"]
-                
+
                 var addImageURI = '/plugin/' + pluginId + '/images';
 
                 $.ajax({
@@ -174,19 +177,18 @@
                     url : addImageURI,
                     contentType: "application/json",
                     data : JSON.stringify({ 'ressourceId' : imageId}),
-                    success: function(){    
-                        location.reload();   
+                    success: function(){
+                        location.reload();
                     }
                 }).done(function(){
                     $("#addImageGallery").hide();
-                    $('.modal-backdrop').remove(); 
+                    $('.modal-backdrop').remove();
                 })
             })
-            
+
         });
     }
 </script>
 
 </body>
 </html>
-

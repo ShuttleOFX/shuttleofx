@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}
+<div class="header-content" data-0="height:100px" data-150="height:0px">
+    <div class="top-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 data-0="margin-top:25px;font-size:3em;" data-150="margin-top:-55px;font-size:2em;">
+                        About OpenFX
+                    </h1>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block subtitle %}
+<div class="bottom-header">
+    <div class="navbar navbar-default">
+        <div class="navbar-collapse collapse navbar-responsive-collapse-filter">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="/plugin"><i class="fa fa-angle-left"></i> Back to all plugins</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+<div class="main-content" id="plugins">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="filter-page">
+                    <div class="info_block">
+                        <div class="info_block_title">
+                            <h2>What is OFX?</h2>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-1 col-md-offset-1">
+                                <i class="big fa fa-question-circle"></i>
+                            </div>
+                            <div class="col-md-9">
+                                <p>
+                                    <i class="fa fa-terminal"></i> OFX is an open
+                                    API for writing visual effects plug-ins for a
+                                    wide variety of applications, such as video
+                                    editing systems and compositing systems.
+                                    This guide demonstrates by example the low
+                                    level C APIs that defines OFX.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-9 col-md-offset-1">
+                                <p>
+                                    <i class="fa fa-terminal"></i> Do you write
+                                    visual effects or image processing software?
+                                    Do you have an application which deals with
+                                    moving images and hosts plug-ins or would like
+                                    to host plug-ins? Then OFX is for you.
+                                </p>
+                            </div>
+                            <div class="col-md-1">
+                                <i class="big fa fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
