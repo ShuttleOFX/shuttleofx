@@ -51,13 +51,13 @@
                     <img class="signedIn" src="{{user.picture}}">
                     <p class="userName">
                         {{user.name}}
-                        <a class="signedIn" href="/logout"><i class="fa fa-lock"></i>Logout</a>
+                        <a class="signedIn" href="/logout"><i class="icon tiny icon-logout"></i>Logout</a>
                     </p>
                 </li>
             {% else %}
                 <li class="userunloged">
                     <p class="userName">
-                        <a class="signedIn" href="/login"><i class="fa fa-unlock"></i>Login</a>
+                        <a class="signedIn" href="/login"><i class="icon icon-login"></i>Login</a>
                     </p>
                 </li>
             {% endif %}
@@ -65,15 +65,15 @@
             <li class="title-nav" style="margin-top:2em;"><h4>NAVIGATION</h4></li>
 
             <li class="active">
-                <a href='/plugin'><i class="fa fa-crop"></i>Explore plugins</a>
+                <a href='/plugin'><i class="icon icon-explore"></i>Explore plugins</a>
             </li>
             {% if user %}
             <li>
-                <a href='/upload'><i class="fa fa-cloud-upload"></i>Upload new plugins</a>
+                <a href='/upload'><i class="icon icon-upload"></i>Upload new plugins</a>
             </li>
             {% endif %}
             <li>
-                <a href='/about'><i class="fa fa-info"></i>About OpenFX</a>
+                <a href='/about'><i class="icon icon-info"></i>About OpenFX</a>
             </li>
             <li class="title-nav"><h4>MORE</h4></li>
             <!--
@@ -85,7 +85,7 @@
                 </ul>
             </li>-->
             <li>
-                <a href='http://www.openeffects.org' target="_blank"><i class="fa fa-share-alt"></i>OFX community</a>
+                <a href='http://www.openeffects.org' target="_blank"><i class="icon icon-display1"></i>OFX community</a>
             </li>
         </ul>
     </div>
