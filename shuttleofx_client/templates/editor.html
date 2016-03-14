@@ -86,6 +86,17 @@
                         </div>
                         <h4>Image from ShuttleOFX resources</h4>
                         <div class="row">
+                            <button id="randomInputPic" pluginId="{{plugin.rawIdentifier}}"
+                                {% for context in plugin.properties.OfxImageEffectPropSupportedContexts.propValues %}
+                                    {% if context != "OfxImageEffectContextGeneral" %}
+                                        class="btn btn-primary {{context}}"
+                                    {% endif %}
+                                {% endfor%}
+                            >
+                                <i class="fa fa-random"></i>
+                            </button>
+                          </div>
+                        <div class="row">
                             {% for resource in resources.resources %}
                                 {% for key in resource._id %}
                                     <div class="col-md-3">
