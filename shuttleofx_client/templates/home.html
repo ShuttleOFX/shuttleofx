@@ -23,16 +23,21 @@
 {% block content %}
 <div class="home">
     <div class="header">
-
         <div class="row">
-            <div class="col-md-12">
+            <img src="{{ url_for('static', filename='images/header.png') }}" alt="" />
+            <div class="col-md-8 col-md-offset-4">
+                <p class="title">
+                    ShuttleOFX
+                </p>
                 <p class="base-line">
                     Create, share and play online with image processing plugins.
                 </p>
+                <!--
                 <p class="fork">
                     Help us develop the platform
                     <iframe src="http://ghbtns.com/github-btn.html?user=ShuttleOFX&repo=shuttleofx&type=fork&count=true&size=large" frameborder="0" scrolling="0" allowTransparency="true" height="30" width="170" style="padding-top:0px;margin-left:10px;"></iframe>
                 </p>
+                -->
             </div>
         </div>
     </div>
@@ -113,7 +118,7 @@
                 </div>
             </div>
             <div class="col-md-2">
-                <img src="{{ url_for('static', filename='images/personae/dev.png') }}" alt="" />
+                <img src="{{ url_for('static', filename='images/personae/rch.png') }}" alt="" />
                 <div class="content">
                     <p>
                         Researcher
