@@ -106,6 +106,7 @@
 </nav>
 
 <div id="container">
+    {% block header %}
     <header class="header">
         <span class="open icon">&#9776;</span>
         <div class="navbar search-bar">
@@ -118,6 +119,7 @@
         {% block title %}{% endblock %}
         {% block subtitle %}{% endblock %}
     </header>
+    {% endblock %}
 
     <section id="scroller">
         <div class="main">

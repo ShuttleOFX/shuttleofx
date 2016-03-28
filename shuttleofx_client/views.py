@@ -39,8 +39,8 @@ def page_not_found(e):
 def index():
     user = userManager.getUser()
     if user is not None:
-        return render_template("index.html", user=user)
-    return render_template("index.html")
+        return render_template("home.html", user=user)
+    return render_template("home.html")
 
 
 @config.g_app.route('/plugin')
@@ -438,7 +438,7 @@ def downloadImgFromUrl():
     '''
     header = {'content-type' : 'application/json'}
     req = requests.post(config.renderRootUri + "/downloadImgFromUrl", data=request.data, headers=header)
-    
+
     if req.status_code != requests.codes.ok:
     	abort(make_response(req.content, req.status_code))
 

@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+
+{% block styles %}
+<!-- Styles -->
+<link href='http://fonts.googleapis.com/css?family=Roboto:200,300,400,500,700' rel='stylesheet' type='text/css'>
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/bootstrap.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+
+<!-- favicon -->
+<link rel="icon" type="image/png" sizes="192x192"  href="{{ url_for('static', filename='images/android-icon-192x192.png') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+<link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='images/favicon-96x96.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="home">
+    <div class="header">
+        <div class="row">
+            <img src="{{ url_for('static', filename='images/header.png') }}" alt="" />
+            <div class="col-md-8 col-md-offset-4">
+                <p class="title">
+                    ShuttleOFX
+                </p>
+                <p class="base-line">
+                    Create, share and play online with image processing plugins.
+                </p>
+                <!--
+                <p class="fork">
+                    Help us develop the platform
+                    <iframe src="http://ghbtns.com/github-btn.html?user=ShuttleOFX&repo=shuttleofx&type=fork&count=true&size=large" frameborder="0" scrolling="0" allowTransparency="true" height="30" width="170" style="padding-top:0px;margin-left:10px;"></iframe>
+                </p>
+                -->
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="video is-hidden">
+        <img src="http://lorempixel.com/1920/1080" width="100%"/>
+    </div>
+    -->
+    <div class="part">
+        <div class="row no-margins">
+            <div class="col-md-4 title">
+                <span>
+                    Welcome
+                </span>
+                <span>
+                    on board
+                </span>
+            </div>
+            <div class="col-md-7 content">
+                <p>
+                    The ShuttleOFX platform is designed to share OpenFX plugins
+                    between plugins creators (industrials, developpers, researchers, students, ...)
+                    and graphic artists.
+                </p>
+                <p>
+                    Following the TuttleOFX initiative, the ambition is to promote
+                    a standard way to create image processing algorithms usable across softwares.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="part">
+        <div class="row no-margins">
+            <div class="col-md-4 title">
+                <span>
+                    What
+                </span>
+                <span>
+                    is OFX?
+                </span>
+            </div>
+            <div class="col-md-7 content">
+                <p>
+                    OFX is an open API for writing visual effects plug-ins for a wide variety of applications,
+                    such as video editing and compositing systems.
+                    This guide demonstrates by example the low level C APIs that defines OFX.
+                </p>
+                <p>
+                    Do you write visual effects or image processing software?
+                    Do you have an application which deals with moving images and
+                    hosts plug-ins or would like to host plug-ins? Then OFX is for you.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="actors">
+        <div class="row no-margins">
+            <div class="col-md-2 col-md-offset-4">
+                <img src="{{ url_for('static', filename='images/personae/ga.png') }}" alt="" />
+                <div class="content">
+                    <p>
+                        Graphic
+                    </p>
+                    <p>
+                        artist
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <img src="{{ url_for('static', filename='images/personae/dev.png') }}" alt="" />
+                <div class="content">
+                    <p>
+                        Plugin
+                    </p>
+                    <p>
+                        creator
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <img src="{{ url_for('static', filename='images/personae/rch.png') }}" alt="" />
+                <div class="content">
+                    <p>
+                        Researcher
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
