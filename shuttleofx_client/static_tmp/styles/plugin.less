@@ -64,9 +64,24 @@ h2.title-plugin{
         max-width: 100%;
         transform: translateY(-50%);
     }
+    &:hover > .set-default-img{
+        display: inline-block;
+    }
+    .set-default-img{
+        display: none;
+    }
 }
 
-#addImageGallery{
+.set-default-img i.fa-star:hover {
+    color: #00796b;
+}
+
+#fullSizeImage {
+    z-index: 100000!important;
+    margin-top: 15%;
+}
+
+#addImageGallery {
     z-index: 100000!important;
     margin-top: 15%;
     .modal-body{
@@ -156,5 +171,33 @@ h2.title-plugin{
     color: #fff;
     &:hover, &:focus{
         color: #DBDBDB;
+    }
+}
+
+div#version {
+    display: inline-block;
+
+    i {
+        position: relative;
+        left: 50px;
+    }
+
+    select{
+        background: transparent;
+        border: none;
+        -moz-appearance: none;
+        -o-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 75px;
+        position: relative;
+        left: -30px;
+        &:hover{
+            cursor: pointer;
+        }
+    }
+
+    option {
+        background: @ofxColor;
     }
 }

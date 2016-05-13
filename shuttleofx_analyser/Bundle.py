@@ -11,9 +11,6 @@ from pyTuttle import tuttle
 import config
 import Plugin
 
-if not os.path.exists(config.tmpRenderingPath):
-    os.makedirs(config.tmpRenderingPath)
-
 def extractDatasAsTar(datas, outputPath):
     '''
     Extract bundle as a tar file.
@@ -47,7 +44,6 @@ def extractDatasAsZip(datas, outputPath):
     except IOError:
         print "error while extracting the zip archive"
     else:
-        os.remove(tempFilePath)
         raise NotImplementedError()
         # TODO : extract archive as zip
 
@@ -87,7 +83,7 @@ def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
     sharedBundleDatas['analyse'] = 'waiting'
     sharedBundleDatas['extraction'] = 'running'
 
-    bundlePath = os.path.join(config.tmpRenderingPath, str(bundleId))
+    bundlePath = os.path.join(config.bundleRootPath, str(bundleId))
 
     os.mkdir(bundlePath)
 
@@ -110,7 +106,7 @@ def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
         logging.warning('tempFilepath: %s', tempFilepath)
 
         env = dict(os.environ)
-        # env['OFX_PLUGIN_PATH'] = bundlePath
+        env['OFX_PLUGIN_PATH'] = bundlePath
         env['LD_LIBRARY_PATH'] = ':'.join([env.get('LD_LIBRARY_PATH', ''), '{bundlePath}/lib:{bundlePath}/lib64'.format(bundlePath=bundlePath)])
         logging.warning('LD_LIBRARY_PATH: %s', env['LD_LIBRARY_PATH'])
 
@@ -131,7 +127,10 @@ def launchAnalyse(sharedBundleDatas, bundleExt, bundleBin, bundleId):
         analysedBundle = json.load(open(tempFilepath, 'r'))
         # os.path.remove(tempFilepath)
 
-    sharedBundleDatas['analyse'] = 'done'
+    if not analysedBundle:
+        sharedBundleDatas['analyse'] = 'error'
+    else:
+        sharedBundleDatas['analyse'] = 'done'
 
     # print analysedBundle
 

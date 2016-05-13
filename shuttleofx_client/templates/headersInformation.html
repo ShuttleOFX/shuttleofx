@@ -1,0 +1,161 @@
+{% block head %}
+<!doctype>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Armand Biteau, Juliette Belin, Hugo Garrido">
+    <title>ShuttleOFX</title>
+
+    <meta property="og:title" content="ShuttleOFX" />
+    <meta property="og:description" content="Create, share and play online with image processing plugins." />
+    <meta property="og:url" content="http://shuttleofx.org/" />
+    <meta property="og:image" content="http://shuttleofx.org/static/images/logo2.png" />
+
+    <!-- Styles -->
+    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/bootstrap-markdown.min.css') }}">
+    <!--
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/vendor/material.css') }}">
+    -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+    {% block styles %}
+    {% endblock %}
+
+    <!-- favicon -->
+    <link rel="icon" type="image/png" sizes="192x192"  href="{{ url_for('static', filename='images/android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='images/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <!-- google referencement -->
+    <meta name="google-site-verification" content="_vjguy9WwHpmCc2ruO90YEf2Yyk0tTbh992JkOjTDBg" />
+
+    <!-- jQuery -->
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+
+	<!-- JQuery UI -->
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+
+    <!-- markdown -->
+    {% block markdown %}{% endblock %}
+    <script src="{{ url_for('static', filename='scripts/vendor/markdown.js') }}" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='scripts/vendor/bootstrap-markdown.js') }}" charset="utf-8"></script>
+
+</head>
+{% endblock %}
+
+<body>
+
+{% block nav %}
+<nav id="main-nav" class="navigation overflow">
+    <div id="left-nav">
+        <a href="/">
+            <div class="mainLogo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}">
+                <span>ShuttleOFX</span>
+            </div>
+        </a>
+        <ul>
+            {% if user %}
+                <li class="userloged">
+                    <img class="signedIn" src="{{user.picture}}">
+                    <p class="userName">
+                        {{user.name}}
+                        <a class="signedIn" href="/logout"><i class="fa fa-lock"></i>Logout</a>
+                    </p>
+                </li>
+            {% else %}
+                <li class="userunloged">
+                    <p class="userName">
+                        <a class="signedIn" href="#"><i class="fa fa-unlock"></i>Login</a>
+                    </p>
+                    <div>
+                        <a class="signedIn" href="/login/google"><i class="fa fa-google"></i>with Google</a>
+                        <a class="signedIn" href="/login/github"><i class="fa fa-github"></i>with Github</a>
+                    </div>
+                </li>
+            {% endif %}
+
+            <li class="title-nav" style="margin-top:2em;"><h4>NAVIGATION</h4></li>
+            <li>
+                <a href='/' {% if request.path == '/' %}class="active"{% endif %}><i class="fa fa-fw fa-home"></i>Home</a>
+            </li>
+            <li>
+                <a href='/plugin' {% if request.path == '/plugin' or request.path == '/category' %}class="active"{% endif %}><i class="fa fa-fw fa-crop"></i>Explore plugins</a>
+                <div id="categories" data-path="{{ request.url }}"></div>
+            </li>
+            <li>
+                <a href='/upload' {% if request.path == '/upload' %}class="active"{% endif %}><i class="fa fa-fw fa-cloud-upload"></i>Upload new plugins</a>
+                <a href='/create' {% if request.path == '/create' %}class="active"{% endif %}><i class="fa fa-fw fa-plus"></i>Create a plugin</a>
+            </li>
+            <li>
+                <a href='/about' {% if request.path == '/about' %}class="active"{% endif %}><i class="fa fa-fw fa-info"></i>About OpenFX</a>
+            </li>
+            <li class="title-nav"><h4>MORE</h4></li>
+            <li>
+                <a href='http://www.openeffects.org' target="_blank"><i class="fa fa-share-alt"></i>OFX community</a>
+            </li>
+
+
+			<li class="title-nav"></li>
+			<li class=>
+				<a href='http://www.ingenieur-imac.fr/' target="_blank">
+					<img src="{{ url_for('static', filename='images/logo_imac.png') }}"
+						style="display: inline-block; width: 23px"/>
+					IMAC engineer school
+				</a>
+			</li>
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block body %}
+{% endblock %}
+
+
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="{{ url_for('static', filename='scripts/vendor/ripples.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/vendor/material.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/scripts.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/categories.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/vendor/dropzone.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/vendor/jquery.nouislider.min.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/clips.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/vendor/js.cookie.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/counter.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/plugin.js') }}"></script>
+
+<!-- FIXME Script inclusion is a total mess, we load scripts that we need only on specific pages 
+           Should use the block script and inheritance -->
+<script type="text/javascript">
+    $(document).ready(function () {
+      updateLinkWithUserSortingPrefs($('#categories a'), false);
+  });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.material.init();
+        var site = new Bamboo({
+            menu: true,
+            breakpoint: 768,
+            menuWidth: 265,
+            headerHeight: 50,
+            resize: function(){
+            }
+        });
+    });
+</script>
+
+{% block scripts %}
+{% endblock %}
+</body>
+</html>

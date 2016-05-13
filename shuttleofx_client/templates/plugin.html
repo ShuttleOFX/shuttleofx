@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block back_button %}
-<a href="/" id="back-to-plugins"><i class="fa fa-angle-left"></i> Back to all plugins</a>
+<a href="/plugin" id="back-to-plugins"><i class="fa fa-angle-left"></i> Back to all plugins</a>
 {% endblock %}
 
 {% block title %}
@@ -13,25 +13,43 @@
                      <h1>
                         {{plugin.label}}
                         <small style="color:rgba(255,255,255,0.7);font-weight:300;">
-                            Version {{plugin.version.major}}.{{plugin.version.minor}}
+                            Version
+                            <div id="version">
+                                {% if versions|length > 1 %}
+                                <i class="fa fa-angle-down"></i>
+                                <select onChange="changeVersion(this);">
+                                    {% for version in versions %}
+                                        {% if version.version.major == plugin.version.major and version.version.minor == plugin.version.minor %}
+                                            <option selected>{{version.version.major}}.{{version.version.minor}}</option>
+                                        {% else %}
+                                            <option>{{version.version.major}}.{{version.version.minor}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                <span>{{versions[0].version.major}}.{{versions[0].version.minor}}</span>
+                                {% endif %}
+                            </div>
                         </small>
                     </h1>
+                    <a href="/plugin/{{plugin.pluginId}}/download/{{plugin.bundleId}}" title="Download plugin's bundle" id="download">
+                        <i class="fa fa-download"></i>
+                    </a>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
                     <ul class="tabs">
-                        <li class="tab"><a {% if active is not defined %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}">General</a></li>
+                        <li class="tab"><a {% if active is not defined %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}/version/{{plugin.version.major}}.{{plugin.version.minor}}">General</a></li>
                         {% if "OfxImageEffectPropSupportedContexts" in plugin.properties %}
                             {% set supportedContexts = plugin.properties.OfxImageEffectPropSupportedContexts.propValues %}
                             {% if "OfxImageEffectContextFilter" in supportedContexts or "OfxImageEffectContextGenerator" in supportedContexts %}
-                                <li class="tab"><a {% if active == "demo" %}class="active"{% endif %} href="/editor/{{plugin.rawIdentifier}}">Demo</a></li>
+                                <li class="tab"><a {% if active == "demo" %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}/version/{{plugin.version.major}}.{{plugin.version.minor}}/demo">Demo</a></li>
                             {% endif %}
                         {% endif %}
-                        <li class="tab"><a {% if active == "info" %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}/info">Technical info</a></li>
-                        <!-- FIXME enable these tabs when wiki and/or comments are active -->
-                        <li class="tab"><a {% if active == "wiki" %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}/wiki">Wiki</a></li>
-                        <li class="tab"><a {% if active == "comments" %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}/comments">Comments</a></li>
+                        <li class="tab"><a {% if active == "wiki" %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}/version/{{plugin.version.major}}.{{plugin.version.minor}}/wiki">Documentation</a></li>
+                        <li class="tab"><a {% if active == "comments" %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}/version/{{plugin.version.major}}.{{plugin.version.minor}}/comments">Comments</a></li>
+                        <li class="tab"><a {% if active == "info" %}class="active"{% endif %} href="/plugin/{{plugin.rawIdentifier}}/version/{{plugin.version.major}}.{{plugin.version.minor}}/info">Technical</a></li>
                     </ul>
                 </div>
             </div>
@@ -53,6 +71,7 @@
                         {{plugin.properties.OfxPropPluginDescription.value}}
                     {% endif %}
                 </p>
+                <span id="grouping" attr-grouping="{{ plugin.properties.OfxImageEffectPluginPropGrouping.value }}"></span>
             </div>
         </div>
 
@@ -61,6 +80,7 @@
             {% if "OfxImageEffectContextFilter" in supportedContexts or
                "OfxImageEffectContextGenerator" in supportedContexts
                %}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="page-header">
@@ -77,7 +97,7 @@
             {% if not plugin.sampleImagesPath %}
                 <div class="col-md-12">
                     <p>No example found.... <i class="fa fa-meh-o"></i></p>
-                    <p style="font-size: 16pt;"> 
+                    <p style="font-size: 16pt;">
                         {% if  user %}
                         Upload yours ! <i class="fa fa-rocket"></i>
                         {% else %}
@@ -88,9 +108,18 @@
             {% else %}
                 {% for image in plugin.sampleImagesPath %}
                     <div class="col-md-3">
-                        <div class="preview-img panel panel-primary img-responsive">
-                            <img src="/plugin/{{plugin.pluginId}}/image/{{image}}">
-                        </div>
+						<div class="preview-img panel panel-primary img-responsive">
+							<img class="gallery-preview-img" src="/plugin/{{plugin.pluginId}}/thumbnail/{{image}}"
+								data-toggle="modal" data-target="#fullSizeImage">
+
+							<button class="set-default-img btn btn-link" style="margin: 0; padding: 0; transform: translateY(-133%)">
+								{% if image == plugin.defautImagePath %}
+								<i class="fa fa-check"></i>
+								{% else %}
+								<i class="fa fa-star"></i>
+								{% endif %}
+							</button>
+						</div>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -99,6 +128,20 @@
         {% endif %}
 
 
+<div class="modal" id="fullSizeImage" style="margin: auto">
+	<div class="modal-dialog" style="display: flex; justify-content: center">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h4 class="modal-title">Example image</h4>
+			</div>
+
+			<div class="modal-body" >
+				<img id="fullSizeDisplay" style="margin: auto" src="">
+			</div>
+		</div>
+	</div>
+</div>
 
 {% if user %}
 <div class="modal" id="addImageGallery">
@@ -128,22 +171,4 @@
     </div>
 </div>
 {% endif %}
-{% endblock %}
-
-{% block scripts %}
-    <script type="text/javascript">
-        // Read cookies content and update the back link
-        // to redirect to the plugins page with the right preferences :
-        // nbr of plugins and page
-        $(document).ready(function() {
-            var href = $("#back-to-plugins").attr("href");
-            var prefs = Cookies.getJSON("user_sorting_prefs");
-            if(prefs && prefs.count && prefs.skip && prefs.search && prefs.page){
-                $("#back-to-plugins").attr("href", href + prefs.page + "?search=" + prefs.search + "&count=" + prefs.count + "&skip=" + prefs.skip );
-            } else {
-                $("#back-to-plugins").attr("href", href + prefs.page + "?count=" + prefs.count + "&skip=" + prefs.skip );
-            }
-        });
-
-    </script>
 {% endblock %}

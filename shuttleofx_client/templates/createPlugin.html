@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block back_button %}
+    <a href="/plugin" id="back-to-plugins"><i class="fa fa-angle-left"></i> Back to all plugins</a>
+{% endblock %}
+
+{% block title %}
+<div class="header-content">
+    <div class="top-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                     <h1>
+                      Create a plugin
+                    </h1>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="main-content no-bottom-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    {% if status %}
+                    <div class="message {{ status }}">
+                        <p>{{ message|capitalize() }}</p>
+                    </div>
+                    {% endif %}
+                    <p>
+                        Here you can create an OFX plugin from scratch. You just need to fill in the following form :
+                    </p>
+                </div>
+            </div>
+            <form method="POST">
+                <div class="row">
+                    <fieldset>
+                        <div class="col-md-6">
+                            <input type='text' name="pluginName" required pattern="[a-zA-Z]+" placeholder="Name (only alphabetic characters)" class="form-control empty panel panel-primary validate">
+                            <textarea rows="4" cols="50" placeholder="Description" name="pluginDescription" class="form-control empty panel panel-primary validate"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <input type='text' name="pluginLabel" placeholder="Label" class="form-control panel panel-primary">
+                            <input type='text' name="pluginLongLabel" placeholder="Long label" class="form-control panel panel-primary">
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type='text' name="pluginMenu" required placeholder="Menu: Tuttle/Image/Io" class="form-control panel panel-primary">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <fieldset>
+                            <input type='text' name="id" required placeholder="Plugin unique id: country.company.pluginid" class="form-control panel panel-primary">
+                        </fieldset>
+                    </div>
+                </div>
+
+                <button type="submit" formaction="/create/repo" class="btn btn-primary {% if provider != "github" %} disabled{% endif %}"><i class="fa fa-github"></i> Using Github</button>
+                <button type="submit" formaction="/create/sources" class="btn btn-primary"><i class="fa fa-download"></i> Using sources</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

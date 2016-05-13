@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block back_button %}
+    <a href="/plugin" id="back-to-plugins"><i class="fa fa-angle-left"></i> Back to all plugins</a>
+{% endblock %}
+
+{% block title %}
+<div class="header-content">
+    <div class="top-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                     <h1>
+                      Plugin successfully created
+                    </h1>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="main-content no-bottom-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Your plugin has successfully been created!</h2>
+                    <p>Check the following links to get started:</p>
+                    <div class="text-center">
+                        <a href="http://github.com/{{userGithubAlias}}/{{repoName}}"  class="btn btn-primary" >Github</a>
+                        <a href="http://travis-ci.org/{{userGithubAlias}}/{{repoName}}"  class="btn btn-primary">Travis</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -20,12 +20,15 @@
                                     {% endfor%}
                                 >
 
+								{%  if user %}
                                 <a href="#" id="addGalleryImage" title="Add to preview gallery" pluginId="{{plugin.pluginId}}">
                                     <i class="fa fa-thumb-tack"></i>
                                 </a>
+								{%  endif %}
                                 <a href="#" id="download-view" title="Download the rendered image" data-toggle="modal" data-target="#downloadModal">
                                     <i class="fa fa-cloud-download"></i>
                                 </a>
+
 								<div class="preloader-wrapper extra-small">
 									<div class="spinner-layer">
 										<div class="circle-clipper left">

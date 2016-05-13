@@ -55,6 +55,7 @@ github = oauth.remote_app(
     base_url='https://api.github.com/user',
     access_token_url='https://github.com/login/oauth/access_token',
     authorize_url='https://github.com/login/oauth/authorize',
+    request_token_params={'scope': 'public_repo'}
 )
 
 def get_resource_as_string(name, charset='utf-8'):

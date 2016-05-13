@@ -5,7 +5,7 @@
       - Handle events to expand/minimize
 ********************************************/
 $(document).ready(function() {
-    $("#left-nav ul li#categories").on('click', 'ul li i',function(){
+    $("#left-nav ul div#categories").on('click', 'ul li i.folder',function(){
         var category = $(this).next('a').text(); // get category name
 
         $(this).parent().children('ul').slideToggle(300, function(){
@@ -18,9 +18,24 @@ $(document).ready(function() {
             }
         });
 
-        $(this).toggleClass('fa-minus', 'fa-plus');
+        $(this).toggleClass('fa-folder-open', 'fa-folder');
     });
 });
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
 
 $.ajax({
     url: '/plugins',
@@ -44,34 +59,40 @@ $.ajax({
         }
     }
 
-    var depth = 0;
-    var html = generateHtmlFromCategoriesTree(categoryTree, '', depth);
+    var html = generateHtmlFromCategoriesTree(categoryTree, '');
     $('#categories').append(html);
     // When all categories are loaded and append,
     // re-open the ones that were opened on the previous page
     autoOpenCategories();
 });
 
-function generateHtmlFromCategoriesTree(object, previous, depth){
+function generateHtmlFromCategoriesTree(object, previous){
+    var urlCategory = getUrlParameter('search');
+    var pluginCategory = $("#grouping").attr("attr-grouping");
+    var linkClass = "";
     var html = '<ul>';
-
     for (var i = 0; i < Object.keys(object).length; i++) {
+        var link = previous;
         // Do not add a / if it's the root element
-        if (depth === 0) {
-            previous += '/category?search=' + Object.keys(object)[i];
+        if (link.length === 0) {
+            link += '/category?search=' + Object.keys(object)[i];
         } else {
-            previous += '/' + Object.keys(object)[i];
+            link += '/' + Object.keys(object)[i];
+        }
+
+                //if current url matches the category
+        if (urlCategory == link.split("/category?search=")[1]){
+            linkClass ="class = 'activeCategory'";
+        }else{
+            linkClass = "";
         }
 
         if ($.isEmptyObject(object[Object.keys(object)[i]])) {
-            html += '<li><a href="'+ previous + '">' + Object.keys(object)[i] + '</a>';
+            html += '<li><i class="nofolder fa fa-fw"> - </i><a href="'+ link + '"'+linkClass+'>' + Object.keys(object)[i] + '</a>';
         } else {
-            html += '<li><i class="fa fa-plus"></i><a href="'+ previous + '">' + Object.keys(object)[i] + '</a>';
-            depth++;
-            html += generateHtmlFromCategoriesTree(object[Object.keys(object)[i]], previous, depth);
+            html += '<li><i class="folder fa fa-fw fa-folder"></i><a href="'+ link + '"'+linkClass+'>' + Object.keys(object)[i] + '</a>';
+            html += generateHtmlFromCategoriesTree(object[Object.keys(object)[i]], link);
         }
-
-        previous = previous.substring(0, previous.length - Object.keys(object)[i].length - 1);
         html += '</li>';
     }
     html += '</ul>';
@@ -90,10 +111,10 @@ function autoOpenCategories(){
     if (Cookies.get("open_categories")) {
         var openedCategories = Cookies.get("open_categories").split(",");
         // Loop through each category and open it, if it's in the array of opened categories
-        $("#left-nav ul li#categories ul li").each(function(index) {
+        $("#left-nav ul div#categories ul li").each(function(index) {
             if ( openedCategories.indexOf( $(this).children('a').text() ) > -1) {
                 $(this).children('ul').show();
-                $(this).children('i').toggleClass('fa-minus', 'fa-plus');
+                $(this).children('i').toggleClass('fa-folder-open', 'fa-folder');
             };
         });
     }

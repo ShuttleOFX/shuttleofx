@@ -14,7 +14,7 @@ import multiprocessing
 config =  ConfigParser.RawConfigParser()
 config.read('/etc/shuttleofx/analyser.cfg')
 
-tmpRenderingPath = config.get('APP_ANALYSER', 'workingTmpDir')
+bundleRootPath = config.get('APP_ANALYSER', 'bundleStore')
 
 g_app = Flask(__name__)
 

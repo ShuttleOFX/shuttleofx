@@ -1,0 +1,227 @@
+//----------------------------------------------------------------
+// Version: 7 (do not remove this line)
+// Sapphire Plug-ins for OFX config file
+// (c) Copyright 2007, GenArts, Inc.  All rights reserved.
+// This file may contain proprietary and confidential information.
+// Please do not copy or distribute without prior written consent.
+//----------------------------------------------------------------
+
+
+// The parameters below are read by all Sapphire Plug-ins.
+// Restart your host application for changes to this file to
+// take effect.
+
+
+// Multi_process_enable should be normally be 1.  It has no effect
+// on single processor workstations.  If you are using a multi-cpu
+// workstation, you can force running with only one processor by
+// setting this to 0.
+
+multi_process_enable: 1
+
+// Sapphire checks for new versions once a week. Set this variable to 0 to
+// disable checking for updates.
+enable_update_checks: 1
+
+// The pixel aspect ratio is normally set from your current sequence,
+// but if force_pixel_aspect_ratio is non-zero here it will be set to
+// that value instead for all Sapphire Plug-ins.  For example, if it is
+// 1.0 you will always get square pixels, or use 1.111 for NTSC, or
+// 0.916 for PAL distortion.
+
+force_pixel_aspect_ratio: 0
+
+
+// If these are uncommented by removing the //, and set to names of
+// Discreet Logic/Cineon format lookup table files, each input image will
+// be remapped according to the input lut, and outputs will be remapped
+// according to the output lut.  Only the first lookup table in each file
+// is used.  These can be useful for linear processing of images in
+// non-linear format.
+//
+// input_lut:  /tmp/8logto12.lut
+// output_lut: /tmp/12to8log.lut
+
+// Use the GPU for faster processing.
+// Set to 'no' to disable GPU processing.
+// Set to a number to choose a specific GPU for processing (if you have multiple graphics
+// cards)
+use_gpu: yes
+
+// Suppress some or all of Sapphire's pop up dialogs.
+// Set to 'all' by default.  This shows all error and expire messages.
+// Set to 'some' to turn off expire messages.  Errors will still be shown.
+// Set to 'none' to turn off all error and expire messages.  Not recommended unless
+//     on a render node where dialog boxes are causing an issue.
+show_dialogs: all
+
+// Uncomment the following line if you do NOT want render licenses
+// to use GUI licenses when there are no render licenses available.
+// default behavior is to use GUI licenses if render licenses run out.
+// rlm_no_promote_render_lics: 1
+
+// Periodically recheck for free RLM licenses.
+// Turned off by default to prevent watermark frames from slipping into a render.
+// To turn on, uncomment the following line by removing the //
+// recheck_rlm_periodically: 1
+
+// Per-host configuration
+
+// Default values
+// enable_crop_params: 1
+// disable_widgets: 0
+// disable_center_widgets: 0
+// two_level_categories: 0
+// backslash_categories: 0
+// short_category_names: 0
+// short_input_names: 0
+// point_param_layout_height: 0
+// disable_autotrans_keyframes: 0
+// separate_slider_limits: 1
+// allow_frame_threading: 0
+// is_premult: 1
+// syncprivatedata_works: 0
+// normalize_scale_param_step_factor: 1
+// help_dialog_modal: 1
+
+// Toxik
+short_category_names:AutodeskToxik: 1
+separate_slider_limits:AutodeskToxik: 0
+normalize_scale_param_step_factor:AutodeskToxik: 500
+is_premult:AutodeskToxik: 0
+help_dialog_modal:AutodeskToxik: 0
+allow_param_disable:AutodeskToxik: 0
+
+// Nuke
+two_level_categories:uk.co.thefoundry.nuke: 1
+short_input_names:uk.co.thefoundry.nuke: 1
+
+// Film Master
+point_param_layout_height:FilmMaster: 3
+normalize_scale_param_step_factor:FilmMaster: 500
+allow_param_disable:FilmMaster: 0
+
+// Fusion
+backslash_categories:com.eyeonline.Fusion: 1
+
+// Baselight
+allow_frame_threading:Baselight: 1
+syncprivatedata_works:Baselight: 1
+is_premult:Baselight: 0
+disable_autotrans_keyframes:Baselight: 1
+help_dialog_modal:Baselight: 0
+
+// SGO Mistika
+syncprivatedata_works:Mistika: 1
+
+// Vegas
+syncprivatedata_works:com.sonycreativesoftware.vegas: 1
+is_premult:com.sonycreativesoftware.vegas: 1
+
+// China Digital Video DX
+is_premult:com.chinadigitalvideo.dx: 0
+
+// Scratch
+allow_param_disable:Assimilator: 0
+is_premult:Assimilator: 0
+point_param_layout_height:Assimilator: 1
+
+//-------------------------------------------------------------
+// Put your custom plug-ins here.  See notes below.
+
+
+
+
+
+
+
+
+//-------------------------------------------------------------
+// You can make custom Sapphire Plug-ins by adding definitions
+// to this file. They are usually read when you restart your host
+// application.
+//
+// Nuke will not find new plugins unless you manually delete its
+// plugin cache.
+// On Windows XP systems, this is usually found at
+// %USERPROFILE%\Local Settings\Temp\nuke\ofxplugincache-VERSION.xml
+// where VERSION is the Nuke version.
+// On Windows 7 with Nuke 6 or later, it is usually
+// %TEMP%\nuke\ofxplugincache\ofxplugincache-VERSION.xml.
+//
+// On Linux and Mac systems, it is usually found at
+// /var/tmp/nuke-u$UID/ofxplugincache-VERSION.xml
+//
+//
+// Some example custom definitions are as follows.
+// If uncommented, this would define an effect called Average3 which
+// would perform a weighted average of 3 input clips:
+//
+//(define Average3 (Source1 Source2 Source3) (rgba_ok)
+//  weight1 = .333
+//  weight2 = .333
+//  weight3 = .333
+//  dest = (+ (* Source1 weight1)
+//	      (+ (* Source2 weight2)
+//	         (* Source3 weight3)))
+//  )
+//
+// This would generate an effect called BlueScale which scales the
+// blue of an input clip by 2.0:
+//
+// (define BlueScale (Source) (rgba_ok)
+//   r = 1.0
+//   g = 1.0
+//   b = 2.0
+//   dest = (* Source (v3 r g b))
+//   )
+//
+// This would scale an input by a pattern of rings:
+//
+//(define RingScale (Source) (rgba_ok)
+//  center = [360 240]      (normalize)
+//  frequency = 10.0      (step .01)
+//  circles = (nsin (* frequency (dist xy center)))
+//  dest = (* Source circles)
+//  )
+//
+// Each definition contains a name, a list of input names, and a
+// set of assignments:
+// (define plug_in_name input-names assignment1 assignement2... )
+// Each assignment is in the form of: variable = expression
+// One assignment must set the variable 'dest' which determines the
+// output image of the effect.  Dest scalars are interpreted as
+// gray values, 3-vectors are rgb colors, and 4-vectors are rgba.
+//
+// An expression can be:
+//  a variable name, an input, x, y, xy, or assigned within the effect.
+//  a number, or a vector of 2 or 3 numbers enclosed in brackets.
+//  a function in the lisp-like form of: (function_name arg1 arg2...)
+//  where each argument is also an expression.
+//
+// The following variables are pre-defined, and can not be assigned:
+//   x       - horizontal pixel coordinate, -1.0 to 1.0.
+//   y       - vertical pixel coordinate, perhaps -.75 to .75.
+//   xy      - 2 element vector of pixel coordinates.
+//
+// For a list of function names and their arguments see the file
+// s_function_list.text
+//
+// All the constant assignments in a definition should automatically
+// appear in the plug-in user interface so they can be adjusted later.
+// A list of additional information can follow a constant assignment
+// in parens and affects the user interface:
+//   min          - the min bound of the value, can be '*' for none.
+//   max          - the max bound of the value.
+//   boolean      - checkbox
+//   color        - causes a 3-vector to appear in the UI as a color.
+//   popup        - list of state names for popup menu.
+//   normalize    - specifies normalized screen coords
+//
+// For example an angle in degrees, a color, and a boolean might be:
+//    angle = 30        (min -180 max 180)
+//    color = [1 1 1]   (color)
+//    invert = 0        (boolean)
+//
+//
+//-----eof-----

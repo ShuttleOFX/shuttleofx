@@ -15,7 +15,6 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
 
     <!-- favicon -->
-
     <link rel="icon" type="image/png" sizes="192x192"  href="{{ url_for('static', filename='images/android-icon-192x192.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='images/favicon-96x96.png') }}">
@@ -241,7 +240,7 @@
                                     <li>
                                         <a href="https://twitter.com/CosmicKick" target="_blank"><i class="fa fa-twitter"></i></a>
                                     </li>
-                                    
+
                                 </ul>
                             </div>
                         </div>
@@ -348,7 +347,7 @@
             </div>
         </div>
     </footer>
-     
+
 
 
 </div>
@@ -368,10 +367,10 @@
 var triggerText = $("#videotrigger").html();
 console.log(triggerText);
 
-function playShuttleVideo() 
-{ 
-    var myPlayer = videojs("#shuttleVideo"); 
-    myPlayer.play(); 
+function playShuttleVideo()
+{
+    var myPlayer = videojs("#shuttleVideo");
+    myPlayer.play();
 }
 function shuttlePlugin(options) {
   this.on('play', function(e) {

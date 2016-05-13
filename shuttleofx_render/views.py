@@ -29,7 +29,7 @@ g_rendersSharedInfo = {}
 # Pool for rendering jobs
 # processes=None => os.cpu_count()
 g_pool = multiprocessing.Pool(processes=4)
-g_enablePool = False
+g_enablePool = True
 
 # Manager to share rendering information
 g_manager = multiprocessing.Manager()
@@ -62,7 +62,7 @@ def newRender():
         g_lastClean = datetime.datetime.now()
 
     inputScene = request.json
-    logging.warning(inputScene)
+    logging.warning("inputScene: " + str(inputScene))
     renderID = str(uuid.uuid1())
     logging.info("RENDERID: " + renderID)
     scene, outputResources = renderScene.convertScenePatterns(inputScene)
@@ -74,7 +74,7 @@ def newRender():
     newRender['scene'] = scene
     g_renders[renderID] = newRender
 
-    config.g_app.logger.debug('new resource is ' + newRender['outputFilename'])
+    logging.warning('new resource is ' + newRender['outputFilename'])
 
     renderSharedInfo = g_manager.dict()
     renderSharedInfo['status'] = 0
@@ -154,7 +154,7 @@ def deleteRenderById(renderID):
     del g_renders[renderID]
 
 
-def generateGraph(fileName):
+def generateProxyThumbnailGraph(folder, fileName):
     '''
     '''
 
@@ -166,14 +166,14 @@ def generateGraph(fileName):
                 u'id': 0,
                 u'plugin': u'reader',
                 u'parameters': [
-                    {u'id': u'filename', u'value': os.path.join(config.resourcesPath, name + extension)}
+                    {u'id': u'filename', u'value': os.path.join(folder, name + extension)}
                 ]
             },
             {
                 u'id': 1,
                 u'plugin': u'tuttle.pngwriter',
                 u'parameters': [
-                    {u'id': u'filename', u'value': os.path.join(config.resourcesPath, 'proxy', name + '.png')}
+                    {u'id': u'filename', u'value': os.path.join(folder, 'proxy', name + '.png')}
                 ]
             },
             {
@@ -188,7 +188,7 @@ def generateGraph(fileName):
                 u'id': 3,
                 u'plugin': u'tuttle.pngwriter',
                 u'parameters': [
-                    {u'id': u'filename', u'value': os.path.join(config.resourcesPath, 'thumbnail', name + '.png')}
+                    {u'id': u'filename', u'value': os.path.join(folder, 'thumbnail', name + '.png')}
                 ]
             }
         ],
@@ -204,11 +204,23 @@ def generateGraph(fileName):
     return graph
 
 
-def generateProxies(graph):
-    inputScene = graph
+def generateProxies(folder, imgName):
+    '''
+    Generate png proxy and thumbnail of the input image.
+    Input image should is:
+     * folder/imgName
+    They will be generated in:
+     * folder/proxy/imageBaseName.png
+     * folder/thumbnail/imageBaseName.png
+
+    :param folder:
+    :param imgName:
+    :return:
+    '''
     renderID = str(uuid.uuid1())
     logging.info("RENDERID: " + renderID)
-    scene = inputScene
+    scene = generateProxyThumbnailGraph(folder, imgName)
+    logging.warning("graph = " + str(scene))
 
     newRender = {}
     newRender['id'] = renderID
@@ -261,9 +273,7 @@ def addFile(file):
     logging.warning("file.filename = " + file.filename)
 
     file.save(imgPath)
-    graph = generateGraph(imgName)
-    logging.warning("graph = " + str(graph))
-    generateProxies(graph)
+    generateProxies(config.resourcesPath, imgName)
 
     resource = config.resourceTable.find_one({"_id": ObjectId(uid)})
     return resource
@@ -307,10 +317,7 @@ def addArchive_Zipfile(archiveFile):
         imgFile.write(file.read(fileLength))
         imgFile.close()
 
-
-        graph = generateGraph(imgName)
-        logging.warning("graph = " + str(graph))
-        generateProxies(graph)
+        generateProxies(config.resourcesPath, imgName)
 
         file.close()
         os.remove(extractPath)

@@ -253,9 +253,9 @@ module.exports = function (grunt) {
       'build',
       'clean:server',
       'concurrent:server',
+      'useminPrepare',
       'autoprefixer',
       'copy:static_tmp',
-      'wait',
       'watch'
     ]);
   });

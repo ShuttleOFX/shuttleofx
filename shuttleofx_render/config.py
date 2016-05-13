@@ -27,6 +27,14 @@ if not os.path.exists(resourcesPath):
 
 pluginsStorage = config.get('APP_RENDER', 'pluginsStorage')
 catalogRootUri = config.get('APP_RENDER', 'catalogRootUri')
+if config.has_option('APP_RENDER', 'dockerImage'):
+    dockerImage = config.get('APP_RENDER', 'dockerImage')
+else:
+    dockerImage = 'shuttleofx/shuttleofx:latest'
+if config.has_option('APP_RENDER', 'timeout_sec'):
+    timeout_sec = config.getint('APP_RENDER', 'timeout_sec')
+else:
+    timeout_sec = 30
 
 
 globalOfxPluginPath = config.get("OFX_PATH", "globalOfxPluginPath")

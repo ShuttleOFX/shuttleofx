@@ -49,7 +49,7 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-6">
-                            <a href="/plugin/{{plugin.rawIdentifier}}/wiki" class="btn btn-primary white"><i class="fa fa-angle-left"></i>Back to wiki</a>
+                            <a href="/plugin/{{plugin.rawIdentifier}}/wiki" class="btn btn-primary white"><i class="fa fa-angle-left"></i>Back to documentation</a>
                         </div>
                         <div class="col-md-6">
                             <input type='submit' value='Save' id="setWiki" class="btn btn-primary pull-right" attr-id="{{plugin.id}}">
@@ -82,7 +82,7 @@
             <div class="col-md-12">
                 <div class="message info">
                     <i class="fa fa-info-circle"></i> 
-                    You must be logged in to edit the wiki !
+                    You must be logged in to edit the documentation !
                 </div>
             </div>
         </div>
@@ -92,6 +92,7 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
 <script type="text/javascript">
 
     // Because highlight.js is a bit awkward at times
@@ -240,7 +241,7 @@ $(document).ready(function() {
     function wikiJson()
     {
         var now = new Date();
-        var m = now.getMonth() + 1;
+        var m = now.getMonth();
         var d = now.getDate();
         var y = now.getFullYear();
         var h = now.getHours();

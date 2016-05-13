@@ -14,6 +14,7 @@ import subprocess
 import argparse
 import copy
 import cache
+import uuid
 
 
 class ProgressHandle(tuttle.IProgressHandle):
@@ -56,7 +57,7 @@ def configLocalPluginPath(ofxPluginPaths):
 
 
 def loadGraph(scene):
-    # logging.warning("loadGraph : " + str(scene))
+    logging.warning("loadGraph : " + str(scene))
     tuttleGraph = tuttle.Graph()
 
     nodes = []
@@ -108,17 +109,23 @@ def convertScenePatterns(scene):
     :return: (scene, outputFilepaths)
     '''
     outputScene = copy.deepcopy(scene)
+    # Preload general plugins to use getBestReader/getBestWriter.
     tuttle.core().getPluginCache().addDirectoryToPath(globalOfxPluginPath)
     tuttle.core().preload(False)
-
-    logging.warning("outputScene" + str(outputScene))
+    logging.debug("outputScene: " + str(outputScene))
 
     outputResources = []
     for node in outputScene['nodes']:
 
         if 'plugin' in node and node['plugin'] is not 'reader':
-            resp = requests.get(catalogRootUri + "/bundle/" + node['plugin'] + '/bundle').json()
-            node["bundleId"] = resp['bundleId']
+            logging.debug("Retrieve bundleId from plugin: " + str(node['plugin']))
+            resp = requests.get(catalogRootUri + "/bundle/" + node['plugin'] + '/bundle')
+            if resp.status_code == 404:
+              logging.warning("Cannont retrieve bundleId for plugin: " + str(node['plugin']))
+            else:
+              respJson = resp.json()
+              node["bundleId"] = respJson['bundleId']
+              logging.debug("bundleId: " + str(respJson['bundleId']))
 
         for parameter in node['parameters']:
             logging.warning('param: %s %s', parameter['id'], parameter['value'])
@@ -130,6 +137,19 @@ def convertScenePatterns(scene):
 
                 if 'plugin' not in node and '{UNIQUE_OUTPUT_FILE}' in parameter['value']:
                     node['plugin'] = tuttle.getBestWriter(str(parameter['value']))
+
+    # Declare Bundles paths to TuttleOFX
+    bundleIds = []
+    for node in outputScene['nodes']:
+        if 'bundleId' in node:
+            bundleIds.append(node['bundleId'])
+        else:
+            logging.error("No bundle defined for node: " + str(node))
+    bundlePaths = [os.path.join(pluginsStorage, str(bundleId)) for bundleId in bundleIds]
+    logging.debug("bundlePaths: " + str(bundlePaths))
+    configLocalPluginPath(bundlePaths)
+
+    logging.debug("outputScene after conversion: " + str(outputScene))
 
     # Create a Tuttle Graph to generate the UID for each node
     tuttleGraphTmp = loadGraph(outputScene)
@@ -204,13 +224,14 @@ def computeGraph(renderSharedInfo, newRender, bundlePaths):
 
 def launchComputeGraph(renderSharedInfo, newRender):
     scene = newRender['scene']
-    bundleIds = []
+    bundleIds = set([])
     for node in scene['nodes']:
         if 'bundleId' in node:
-            bundleIds.append(node['bundleId'])
+            bundleIds.add(node['bundleId'])
         else:
-            logging.error("No plugin defined for node: " + str(node))
+            logging.error("No bundle defined for node: " + str(node))
 
+    name = '_'.join([node['plugin'].lower() for node in scene['nodes']])
     bundlePaths = [os.path.join(pluginsStorage, str(bundleId)) for bundleId in bundleIds]
 
     if False:
@@ -237,17 +258,67 @@ def launchComputeGraph(renderSharedInfo, newRender):
                                                     for
                                                     bundlePath in bundlePaths])
         logging.info('LD_LIBRARY_PATH: %s', env['LD_LIBRARY_PATH'])
+        
+        codePath = os.path.dirname(os.path.abspath(__file__))
+        name = 'shuttleofx_render_{uid}'.format(uid=uuid.uuid4())
+        dockerargs = [
+            '/usr/bin/timelimit', '-t', str(config.timeout_sec), '-T', str(config.timeout_sec),
+            '/usr/bin/docker', 'run',
+            # set cpu-shares to 1024 (the default value).
+            # The main docker (for the server) use 4096 to ensure responsiveness.
+            '--cpu-shares=1024',
+            '--memory=500M',  # limit RAM
+            '--memory-swap=-1',  # disable memory swap
+            '--rm=true',  # Automatically remove the container => doesn't work with kill from timelimit
+            '--net=none',  # disables all incoming and outgoing networking
+            # Set a unique name
+            '--name={name}'.format(name=name),
+            # Give access to source code to execute in read-only
+            # '-v', 'DEV_CODE_PATH:{codePath}:ro'.format(codePath=codePath),
+            # '-w', '{codePath}'.format(codePath=codePath),  # set the workdir
+            # Give access to the image cache
+            # '-v', '{renderDirectory}:{renderDirectory}'.format(renderDirectory=config.renderDirectory),
+            # Give access to the output json file
+            '-v', '{tempFilepath}:{tempFilepath}'.format(tempFilepath=tempFilepath),
+            # Give access to config files
+            '-v', '/etc/shuttleofx:/etc/shuttleofx:ro',
+            # TODO: use config instead of hardcoded paths
+            # TODO: limit access to sub-directories
+            '-v', '/opt/shuttleofx:/opt/shuttleofx',
+            ]
+        # Give access to the plugins themselves in read-only
+        # for bundlePath in bundlePaths:
+        #     dockerargs += ['-v', '{bundlePath}:{bundlePath}'.format(bundlePath=bundlePath)]
+        # Name of the docker image (after all options)
+        dockerargs.append(config.dockerImage)
+        
+        pyfile = os.path.abspath(__file__[:-1] if __file__.endswith('.pyc') else __file__)
+        args = [sys.executable, pyfile, tempFilepath]
+        logging.warning('dockerargs: %s', ' '.join(dockerargs))
+        logging.warning('args: %s', ' '.join(args))
 
-        args = [sys.executable, os.path.abspath(__file__), tempFilepath]
-        p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+        p = subprocess.Popen(dockerargs + args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
         stdoutdata, stderrdata = p.communicate()
+
+        # Remove the docker container
+        # We do it manually instead of using --rm=true
+        # to remove the container even if docker was killed by timelimit.
+        subprocess.call(['/usr/bin/docker', 'rm', '-f', name])
+
         if p.returncode:
             renderSharedInfo['status'] = -1
+            tmpData = ""
+            try:
+                tmpData = open(tempFilepath, 'r').read()
+            except:
+                pass
             raise RuntimeError(
                     '''Failed to render.\n
                     Return code: %s\n
-                    Log:\n%s\n%s\n'''
-                    % (p.returncode, stdoutdata, stderrdata))
+                    Log:\n%s\n
+                    Log err:\n%s\n
+                    File data:\n%s\n'''
+                    % (p.returncode, stdoutdata, stderrdata, tmpData))
 
         logging.info(stdoutdata)
         logging.info(stderrdata)

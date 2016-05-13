@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+
+{% block header %}
+    <header class="header home-header">
+        <span class="open icon">&#9776;</span>
+        <div class="navbar search-bar">
+            {% block back_button %}{% endblock %}
+            <form id="searchForm" action="/plugin">
+                  <input type="text" placeholder="Search" id="searchquery" name="search"/>
+                  <button id="searchtrigger" type="submit" value="Submitquery"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+        <div class="header-image">
+            <img alt="header image" src="{{ url_for('static', filename='images/header.png') }}" />
+        </div>
+        <div class="header-content">
+            <div class="top-header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-6 col-lg-offset-4 col-md-6 col-md-offset-6 col-sm-7 col-sm-offset-5">
+                            <h1 class="appTitle">
+                                ShuttleOFX
+                            </h1>
+                            <p>
+                                Create, Share and Play online with image processing plugins
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+
+{% block content %}
+	<div class="home-body main-content ">
+		<div class="container-fluid">
+			<div id="welcome" class="row">
+                <div class="col-md-4">
+                    <h1>Welcome <span>on board</span></h1>
+                </div>
+                <div class="col-md-8">
+                    <p>
+                        The ShuttleOFX platform is designed to share OpenFX plugins between plugins creators (industrials, developpers, researchers, students, ...) and graphic artists.
+                        <br>Following the TuttleOFX initiative, the ambition is to promote a standard way to create image processing algorithms usable across softwares.
+                    </p>
+                </div>
+            </div>
+        	<div id="users" class="row">
+                <div class="col-md-4">
+                    <div class="img">
+                        <img src="{{ url_for('static', filename='images/personae/ga.png') }}" class="img-responsive">
+                    </div>
+                    <div class="group">
+                        <div class="title">
+                            <h2>Graphic&nbsp;Artist</h2>
+                        </div>
+                        <div class="description">
+                            <p>
+                                Find the plugin that really fits your needs, have a look on its documentation and try it online.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="img">
+                        <img src="{{ url_for('static', filename='images/personae/dev.png') }}" class="img-responsive">
+                    </div>
+                    <div class="group">
+                        <div class="title">
+                            <h2>Plugin&nbsp;Developer</h2>
+                        </div>
+                        <div class="description">
+                            <p>
+                                Provide beta testing for people interested in your work.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="img">
+                        <img src="{{ url_for('static', filename='images/personae/researcher.png') }}" class="img-responsive">
+                    </div>
+                    <div class="group">
+                        <div class="title">
+                            <h2>Researcher</h2>
+                        </div>
+                        <div class="description">
+                            <p>
+                                Share the result of your work with the community. Upload your plugin to bring visibility on your products.
+                            </p>
+                        </div>
+                    </div>
+    			</div>
+            </div>
+        	<div id="frame" class="row" >
+                <div class="col-xl-6 col-xl-offset-3 col-md-8 col-md-offset-2 col-xs-8 col-xs-offset-2">
+                    <iframe src="https://player.vimeo.com/video/127664921?color=ff0179" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+        	</div>
+		</div>
+        <div class="home-footer">
+            <div id="format">
+                <div class="col-md-4">
+                    <h1 class="content-format">OpenFX <span>Open Standard</span></h1>
+                </div>
+                <div class="col-md-8">
+                    <p>
+                        OpenFX is an open standard for image processing plug-ins. It allows plug-ins written to the standard to work on any application that supports the standard. This avoids the current per application fragmentation of plugin development and support, which causes much heartache to everyone: plug-in developers, application developers and end-users alike.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+<!--
+<div id="homeContainer">
+
+    <section id="format">
+        <div class="col-md-4">
+            <h1 class="content-format">OpenFX<span>Open standard</span></h1>
+        </div>
+        <div class="col-md-8">
+            <p>
+                OpenFX is an open standard for image processing plug-ins. It allows plug-ins written to the standard to work on any application that supports the standard. This avoids the current per application fragmentation of plugin development and support, which causes much heartache to everyone: plug-in developers, application developers and end-users alike.
+            </p>
+        </div>
+    </section>
+
+</div>-->
+
+
+
+<script src="{{ url_for('static', filename='scripts/home.js') }}"></script>
