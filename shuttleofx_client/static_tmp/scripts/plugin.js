@@ -35,4 +35,22 @@ $(document).ready(function () {
         $(this).addClass("disabled").find('i').attr("class", "fa fa-check");
     });
 
+// recognize URLs and make them cliquable
+
+    if ($(".plugin-description").length) {
+        $(".plugin-description").LinkRecognition({
+            target: "_blank",
+            cssClass: "external-link"
+        });
+    }
+    
+    console.log($(".comment-content"))
+    if ($(".comment-content").length) {
+        $(".comment-content").each(function(){
+            $(this).LinkRecognition({
+                target: "_blank",
+                cssClass: "external-link"
+            });
+        })
+     }
 });

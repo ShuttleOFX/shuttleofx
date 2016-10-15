@@ -29,11 +29,8 @@
 {% block content %}
 <div class="main-content">
     <div class="container-fluid">
-
-        <div class="row">
-            <div class="col-md-12">
+        <div>
                 {% if plugin.wiki %}
-
                     {% for wiki in plugin.wiki %}
                         {% if loop.last %}
                         <div class="row markdownwiki">
@@ -59,7 +56,20 @@
                             </div>
                         </div>
 
-                        <div class="row editor">
+                        <div class="row user-actions">
+                          <div>
+                              <a href="/wiki/edit/{{plugin.rawIdentifier}}" class="btn btn-primary white">Edit</a>
+                          </div>
+                          <div>
+                                <a href="#" id="saveas-markdown" class="btn btn-primary white">Download</a>
+                            </div>
+                            {% if user %}
+                          
+                        </div>
+                    {% endif %}
+        </div>
+
+                        <div class="row edition-infos">
                             <p>
                                 Last Edit
                             </p>
@@ -75,35 +85,15 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div id="menu">
-                                    <div id="saveas-markdown" class="btn btn-primary" title="Download Markdown">
-                                        <span><img class="svg logo-md" src="{{ url_for('static', filename='images/markdown/markdown.svg') }}"></i></span>
-                                    </div>
-                                    <!-- DO NOT REMOVE THAT DIV !!!!!!!!!! -->
+                                    <!-- Display documentation as HTML : Do not remove -->
                                     <div id="saveas-html" class="btn btn-primary hidden">
                                         <span><i class="fa fa-code"></i> Download HTML</span>
                                     </div>
-                                </div>
                             </div>
                         </div>
                         {% endif %}
 
                     {% endfor %}
-                    {% if user %}
-                    <div class="row">
-                        <div class="col-md-6">
-                            <a href="/wiki/edit/{{plugin.rawIdentifier}}" class="btn btn-primary white">Edit documentation</a>
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="message info">
-                                <i class="fa fa-info-circle"></i> You must be logged in to edit the documentation !
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
                 {% else %}
                     {% if user %}
                     <div class="row">
@@ -124,7 +114,6 @@
                                 No documentation has been created yet, you must be logged in to create a new one!
                             </div>
                         </div>
-                    </div>
                     {% endif %}
                 {% endif %}
             </div>

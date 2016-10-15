@@ -28,7 +28,7 @@
 
 {% block content %}
 <div class="main-content">
-    <div class="container-fluid">
+    <div id="container-edit-documentation">
 
         {% if user%}
         <div class="row markdownwiki">
@@ -44,39 +44,45 @@
                         {% endif %}
                         {% endfor %}
                     {% else%}
-                    <textarea id="code"></textarea>
+                    <textarea id="code">
+## Plugin Title
+### A list
+* element
+* element
+
+### A numbered list
+1. element
+2. element
+3. element
+
+A [link](http://example.com).
+
+![Alternative text](http://lorempixel.com/g/400/200/abstract/ "Title")</textarea>
                     {% endif %}
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <a href="/plugin/{{plugin.rawIdentifier}}/wiki" class="btn btn-primary white"><i class="fa fa-angle-left"></i>Back to documentation</a>
-                        </div>
-                        <div class="col-md-6">
-                            <input type='submit' value='Save' id="setWiki" class="btn btn-primary pull-right" attr-id="{{plugin.id}}">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div id="menu">
-                                <div id="saveas-markdown" class="btn btn-primary" title="Download Markdown">
-                                    <span><img class="svg logo-md" src="{{ url_for('static', filename='images/markdown/markdown.svg') }}"></span>
-                                </div>
-                                <!-- DO NOT REMOVE THAT DIV !!!!!!!!!!!!!! -->
-                                <div id="saveas-html" class="btn btn-primary hidden">
-                                    <span><i class="fa fa-code"></i> Download HTML</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="col-md-6">
                 <h3>Preview</h3>
-                <div id="out">
+                <div id="out" class="edit-out">
 
                 </div>
             </div>
         </div>
+                    <div class="row">
+              <p class="markdown-help">
+                                    <hr>
+                    <a href="https://fr.wikipedia.org/wiki/Markdown" title="Markdown syntax documentation">
+                      <i class="fa fa-question-circle" aria-hidden="true"></i>Markdown documentation
+                    <a/>
+                  </p>
+                  <div class="col-md-6">
+                      <a href="/plugin/{{plugin.rawIdentifier}}/wiki" class="btn btn-primary white"><i class="fa fa-angle-left"></i>Back to documentation</a>
+                                            <input type='submit' value='Save' id="setWiki" class="btn btn-primary pull-right" attr-id="{{plugin.id}}">
+
+                  </div>
+                  <div class="col-md-6">
+                  </div>
+              </div>
         {% else %}
         <div class="row">
             <div class="col-md-12">
@@ -161,6 +167,7 @@
       extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
     });
 
+    editor.on('click', update);
     editor.on('load', update);
     editor.on('change', update);
 
@@ -173,13 +180,17 @@
       save(document.getElementById('out').innerHTML, "html.html");
     }
 
-    document.getElementById('saveas-markdown').addEventListener('click', function() {
-      saveAsMarkdown();
-    });
+    if($('#saveas-markdown').length != 0){
+      document.getElementById('saveas-markdown').addEventListener('click', function() {
+          saveAsMarkdown();
+        });
+    }
 
-    document.getElementById('saveas-html').addEventListener('click', function() {
-      saveAsHtml();
-    });
+    if($('#saveas-html').length != 0){
+      document.getElementById('saveas-html').addEventListener('click', function() {
+        saveAsHtml();
+      });
+    }
 
     function save(code, name){
       var blob = new Blob([code], { type: 'text/plain' });

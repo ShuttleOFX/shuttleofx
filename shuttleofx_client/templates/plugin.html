@@ -66,11 +66,9 @@
                 <div class="page-header">
                 <h2>Plugin description</h2>
                 </div>
-                <p>
-                    {% if "OfxPropPluginDescription" in plugin.properties %}
-                        {{plugin.properties.OfxPropPluginDescription.value}}
-                    {% endif %}
-                </p>
+                {% if "OfxPropPluginDescription" in plugin.properties %}
+                <p class="plugin-description" style="white-space: pre-wrap;">{{plugin.properties.OfxPropPluginDescription.value}}</p>
+                {% endif %}
                 <span id="grouping" attr-grouping="{{ plugin.properties.OfxImageEffectPluginPropGrouping.value }}"></span>
             </div>
         </div>
