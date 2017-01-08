@@ -22,7 +22,7 @@ $(document).ready(function () {
                 url: "/plugin/" + pluginId + "/defaultImage/" + imageId,
                 async: false //avoid an empty data when result is returned.
             }).done(function(){
-                $(".set-default-img").removeClass("disabled").find('i').attr("class", "fa fa-star");
+                $(".set-default-img").removeClass("disabled").find('i').attr("class", "fa fa-star-o");
             })
     }
 
@@ -32,7 +32,9 @@ $(document).ready(function () {
         var imageId = $(this).parent().find("img").attr("src").split("/thumbnail/")[1];
 
         setDefaultImage(pluginId, imageId);
-        $(this).addClass("disabled").find('i').attr("class", "fa fa-check");
+        $(this).addClass("disabled").find('i').attr("class", "fa fa-star");
+
+
     });
 
 });

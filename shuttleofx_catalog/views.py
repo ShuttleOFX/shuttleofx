@@ -19,14 +19,15 @@ from Plugin import Plugin
 
 
 @processify
-def generateThumbnail(imgFile):
+def generateThumbnail(imgFile, ext):
+    ext = ext if ext.startswith(".") else "."+ext
     from pyTuttle import tuttle
     tuttle.core().preload(False)
-
+    pluginReader = tuttle.getBestReader("."+ext)
     tuttle.compute([
-        tuttle.NodeInit( "tuttle.pngreader", filename=imgFile),
+        tuttle.NodeInit( pluginReader, filename=imgFile),
         tuttle.NodeInit( "tuttle.resize", width=256, keepRatio=1),
-        tuttle.NodeInit( "tuttle.pngwriter", filename=imgFile + "-thumbnail"),
+        tuttle.NodeInit( "tuttle.pngwriter", filename= imgFile + "-thumbnail"),
         ])
 
 def mongodoc_jsonify(*args, **kwargs):
@@ -504,26 +505,13 @@ def addResource():
     Upload resource file on the database
     '''
 
-    mimetype = request.mimetype
-    name = ""
-    size = request.content_length
-
-    if not mimetype:
-        logging.error("Invalid resource.")
-        abort(make_response("Invalid resource.", 400))
-
-    uid = config.resourceTable.insert({
-        "mimetype" : mimetype,
-        "size" : size,
-        "name" : name})
-
-    img = request.data
-
-    imgFile = os.path.join(config.resourcesPath, str(uid))
     file = request.files['file']
-    file.save(imgFile)
+    mimeType = request.files['file'].content_type
+    uid = config.resourceTable.insert({ "name" : request.files['file'].filename, "mimetype": mimeType })
 
-    generateThumbnail(imgFile)
+    filePathName = os.path.join(config.resourcesPath, str(uid))
+    file.save(filePathName)
+    generateThumbnail(filePathName, mimeType.split("/")[1])
 
     resource = config.resourceTable.find_one({ "_id" : ObjectId(uid)})
     return mongodoc_jsonify(resource)
@@ -588,15 +576,15 @@ def getResourceData(resourceId):
 
 
 @config.g_app.route("/plugin/<int:pluginId>/images", methods= ['POST'])
-def addImageToPlugin(pluginId):
+def addSampleImageToPlugin(pluginId):
+    plugin = config.pluginTable.find_one({"pluginId": pluginId})
+    if plugin == None:
+        abort(404)
+
     if "ressourceId" not in request.get_json() :
         abort(404)
 
     imageId = request.get_json()["ressourceId"]
-
-    plugin = config.pluginTable.find_one({"pluginId": pluginId})
-    if plugin == None:
-        abort(404)
 
     config.pluginTable.update(
         {"pluginId" : pluginId},

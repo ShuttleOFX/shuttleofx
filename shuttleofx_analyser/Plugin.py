@@ -58,7 +58,7 @@ class Plugin(object):
             node = tuttle.createNode(tuttlePlugin.getIdentifier())
         except Exception as e:
             logging.error("Error in node creation: " + str(e))
-            return (self.__dict__)
+            return
 
         # plugin properties
         self.properties = self.convertTuttlePropertiesToDict(node.getProperties())

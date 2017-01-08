@@ -1,6 +1,5 @@
 
 Dropzone.autoDiscover = false;
-console.log("cache");
 var bundleId = undefined;
 var myDropzone = undefined;
 

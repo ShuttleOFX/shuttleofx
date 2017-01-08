@@ -456,11 +456,20 @@ def authorizedGithub():
 
 @config.g_app.route("/plugin/<int:pluginId>/resource", methods=['POST'])
 def addPluginResource(pluginId):
+    '''
+    Add a resource image to the plugin.
+    '''
+
+    authorized_mimetypes = ["image/jpeg", "image/png", "image/gif"]
+
     filename = request.files['file'].filename
+    if(request.files['file'].content_type not in authorized_mimetypes):
+        abort(make_response('Bad file type','500'))
+
     file = request.files['file']
     file.save("/tmp/" + filename)
 
-    multiple_files = [('file', (filename, open("/tmp/" + filename, 'rb'), 'application/gzip'))]
+    multiple_files = [('file', (filename, open("/tmp/" + filename, 'rb'), request.files['file'].content_type))]
 
     req = requests.post(config.catalogRootUri + "/resources", files=multiple_files)
 
@@ -469,9 +478,14 @@ def addPluginResource(pluginId):
 
 @config.g_app.route("/plugin/<int:pluginId>/images", methods=['POST'])
 def addImageToPlugin(pluginId):
+    '''
+    Allow the user to add an image to be displayed as a processed image example for the plugin.
+    '''
+
     req = requests.post(
         config.catalogRootUri + "/plugin/" + str(pluginId) + "/images",
         data=request.data, headers=request.headers)
+
     return jsonify(**req.json())
 
 

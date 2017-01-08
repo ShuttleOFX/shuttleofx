@@ -85,10 +85,7 @@
             <div class="col-md-12">
                 <div class="page-header">
                     <h2>
-                        Examples
-                        {% if user %}
-                        <button class="btn btn-primary btn-addImage" data-toggle="modal" data-target="#addImageGallery"><i class="fa fa-plus"></i></button>
-                        {% endif %}
+                        Samples
                     </h2>
                 </div>
             </div>
@@ -96,14 +93,11 @@
         <div class="row">
             {% if not plugin.sampleImagesPath %}
                 <div class="col-md-12">
-                    <p>No example found.... <i class="fa fa-meh-o"></i></p>
-                    <p style="font-size: 16pt;">
-                        {% if  user %}
-                        Upload yours ! <i class="fa fa-rocket"></i>
-                        {% else %}
-                        Login to upload yours ! <i class="fa fa-rocket"></i>
+                        {% if user %}
+                        <div class="col-md-3 btn-addImage" data-toggle="modal" data-target="#addImageGallery">
+                            <i style="margin: auto; display : block;" class="fa fa-plus fa-2x"></i>
+                        </div>
                         {% endif %}
-                    </p>
                 </div>
             {% else %}
                 {% for image in plugin.sampleImagesPath %}
@@ -112,38 +106,56 @@
 							<img class="gallery-preview-img" src="/plugin/{{plugin.pluginId}}/thumbnail/{{image}}"
 								data-toggle="modal" data-target="#fullSizeImage">
 
-							<button class="set-default-img btn btn-link" style="margin: 0; padding: 0; transform: translateY(-133%)">
+							<button 
+                                {% if image == plugin.defautImagePath %}
+                                    {% set isDisable = "disabled" %}
+                                {% else %}
+                                    {% set isDisable = "" %}
+
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                
+                                title="Define as default image"
+                                {% endif %}
+                                class="set-default-img btn btn-link {{ isDisable }}" style="margin: 0; padding: 0; transform: translateY(-133%)">
 								{% if image == plugin.defautImagePath %}
-								<i class="fa fa-check"></i>
-								{% else %}
 								<i class="fa fa-star"></i>
+								{% else %}
+								<i class="fa fa-star-o"></i>
 								{% endif %}
 							</button>
 						</div>
                     </div>
                 {% endfor %}
+                {% if user %}
+                <div class="col-md-3" data-toggle="modal" data-target="#addImageGallery">
+                    <div class="btn-addImage img-responsive">
+                        <i style="margin: auto; display : block;" class="fa fa-plus fa-2x"></i>
+                    </div>
+                </div>
+                {% endif %}
             {% endif %}
         </div>
             {% endif %}
         {% endif %}
+{% endblock %}
 
-
+{% block modals %}
 <div class="modal" id="fullSizeImage" style="margin: auto">
-	<div class="modal-dialog" style="display: flex; justify-content: center">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-				<h4 class="modal-title">Example image</h4>
-			</div>
+    <div class="modal-dialog" style="display: flex; justify-content: center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Example image</h4>
+            </div>
 
-			<div class="modal-body" >
-				<img id="fullSizeDisplay" style="margin: auto" src="">
-			</div>
-		</div>
-	</div>
+            <div class="modal-body" >
+                <img id="fullSizeDisplay" style="margin: auto" src="">
+            </div>
+        </div>
+    </div>
 </div>
 
-{% if user %}
 <div class="modal" id="addImageGallery">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -153,7 +165,7 @@
             </div>
 
             <div class="modal-body" style="padding: 24px">
-                <form id="addThumbForm" class="dropzone" action="/file-upload">
+                <form id="addThumbForm" class="dropzone" action="/plugin/{{plugin.pluginId}}/images">
                 <div class="form-group">
                     <label for="addGalleryImage" class="col-lg-2 control-label">Browse</label>
                     <div class="col-lg-10">
@@ -165,10 +177,60 @@
 
             <div class="modal-footer" style="padding-top:0px!important">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <div id="uploadtrigger" class="btn btn-primary">Upload a new picture</div>
+                <div id="uploadtrigger" class="btn btn-primary">Upload</div>
             </div>
         </div>
     </div>
 </div>
-{% endif %}
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    if($('#addThumbForm').length > 0){
+        var pluginId = $("#addGalleryImage").attr("attr-id");
+
+        var thumDropzone = new Dropzone("#addThumbForm", {
+            acceptedFiles: "image/jpeg, image/png, image/gif",
+            paramName: "file"
+        });
+
+        $("#uploadtrigger").click(function(event){
+            event.preventDefault();
+            thumDropzone.options.url = '/plugin/'+pluginId+'/resource';
+            thumDropzone.processQueue();
+
+            thumDropzone.on('error', function(err){
+                console.log(err);
+            });
+
+            thumDropzone.on('success', function(data){
+                data = JSON.parse(data.xhr.response);
+                var imageId = data._id["$oid"];
+                var addImageURI = '/plugin/' + pluginId + '/images';
+
+                $.ajax({
+                    type : 'POST',
+                    url : addImageURI,
+                    contentType: "application/json",
+                    data : JSON.stringify({ 'ressourceId' : imageId}),
+                    success: function(){
+                        location.reload();
+                    }
+                }).done(function(){
+                    $("#addImageGallery").hide();
+                    $('.modal-backdrop').remove();
+                })
+            })
+
+
+        });
+
+
+    }
+</script>
 {% endblock %}
